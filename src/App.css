@@ -5663,76 +5663,92 @@ a:focus-visible,
   margin: 20px auto 0;
 }
 
-.collection-quick-stats__grid {
+.collection-quick-stats__panel {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.collection-quick-stats__item {
-  box-sizing: border-box;
-  display: grid;
-  min-width: 0;
-  min-height: 148px;
-  grid-template-rows: 48px auto auto;
-  align-content: space-between;
-  justify-items: start;
-  gap: 5px;
-  padding: 17px 19px 16px;
-  overflow: hidden;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 14px 18px;
   border: 1px solid var(--ui-border);
-  border-radius: 26px;
-  background: var(--ui-surface-strong);
-  color: var(--ui-text);
-  box-shadow: 0 14px 34px rgba(28, 54, 71, 0.09), inset 0 1px rgba(255, 255, 255, 0.62);
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--ui-surface-strong) 72%, transparent);
+  box-shadow: 0 12px 32px rgba(28, 54, 71, 0.08), inset 0 1px rgba(255, 255, 255, 0.48);
   -webkit-backdrop-filter: blur(20px) saturate(145%);
   backdrop-filter: blur(20px) saturate(145%);
 }
 
-.collection-quick-stats__ring {
+.collection-quick-stats__item {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--ui-text);
+}
+
+.collection-quick-stats__circle {
   position: relative;
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 64px;
+  height: 64px;
   place-items: center;
   border-radius: 50%;
-  background: conic-gradient(
-    from -90deg,
-    var(--ui-accent) 0deg var(--stat-progress),
-    color-mix(in srgb, var(--ui-muted) 20%, transparent) var(--stat-progress) 360deg
-  );
+  background: color-mix(in srgb, var(--ui-muted) 9%, transparent);
 }
 
-.collection-quick-stats__ring::before {
+.collection-quick-stats__progress {
   position: absolute;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--ui-surface-strong);
-  content: "";
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
 }
 
-.collection-quick-stats__ring svg {
-  position: relative;
-  z-index: 1;
+.collection-quick-stats__progress circle {
+  fill: transparent;
+  stroke-width: 4;
+}
+
+.collection-quick-stats__track {
+  stroke: color-mix(in srgb, var(--ui-muted) 22%, transparent);
+}
+
+.collection-quick-stats__value {
+  stroke: var(--ui-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 350ms ease;
+}
+
+.collection-quick-stats__circle-content {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
+.collection-quick-stats__circle-content svg {
+  color: var(--ui-text);
 }
 
 .collection-quick-stats__item strong {
-  color: inherit;
-  font-size: clamp(1.9rem, 4vw, 2.55rem);
+  color: var(--ui-text);
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: -0.065em;
-  line-height: 0.95;
+  line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
 
 .collection-quick-stats__item .collection-quick-stats__label {
-  overflow: hidden;
+  max-width: 80px;
   color: var(--ui-muted);
-  font-size: 0.78rem;
-  font-weight: 550;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .collection-quick-stats__latest {
@@ -5749,7 +5765,11 @@ a:focus-visible,
 }
 
 .dark-mode .collection-quick-stats__item {
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.07);
+  color: var(--ui-text);
+}
+
+.dark-mode .collection-quick-stats__panel {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.06);
 }
 
 /* La fascia dei marchi resta a tutta larghezza sotto il hero. */
@@ -6063,39 +6083,28 @@ a:focus-visible,
     margin-top: 22px;
   }
 
-  .collection-quick-stats__grid {
-    gap: 8px;
+  .collection-quick-stats__panel {
+    gap: 4px;
+    padding: 12px 8px;
+    border-radius: 24px;
   }
 
   .collection-quick-stats__item {
-    min-height: 126px;
-    grid-template-rows: 40px auto auto;
-    gap: 4px;
-    padding: 13px 12px;
-    border-radius: 22px;
+    gap: 3px;
   }
 
-  .collection-quick-stats__ring {
-    width: 36px;
-    height: 36px;
-  }
-
-  .collection-quick-stats__ring::before {
-    width: 29px;
-    height: 29px;
-  }
-
-  .collection-quick-stats__ring svg {
-    width: 18px;
-    height: 18px;
+  .collection-quick-stats__circle {
+    width: 54px;
+    height: 54px;
   }
 
   .collection-quick-stats__item strong {
-    font-size: 1.8rem;
+    font-size: 0.9rem;
   }
 
   .collection-quick-stats__item .collection-quick-stats__label {
-    font-size: 0.67rem;
+    max-width: 64px;
+    font-size: 0.62rem;
   }
 
   .collection-quick-stats__latest {

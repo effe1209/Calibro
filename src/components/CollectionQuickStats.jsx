@@ -1,10 +1,11 @@
 import { createElement, useMemo } from 'react';
-import { BatteryCharging, Cog, Watch } from 'lucide-react';
+import { BatteryCharging, Cog, ShieldCheck, Watch } from 'lucide-react';
 
 const CollectionQuickStats = ({ watches = [] }) => {
   const stats = useMemo(() => {
     const automatic = watches.filter((watch) => watch.movement === 'Automatico').length;
     const quartz = watches.filter((watch) => watch.movement === 'Quarzo').length;
+    const warranties = watches.filter((watch) => watch.has_warranty).length;
     const latestWatch = watches.reduce((latest, watch) => {
       const createdAt = Date.parse(watch.created_at || '');
       if (!Number.isFinite(createdAt)) return latest;
@@ -13,16 +14,27 @@ const CollectionQuickStats = ({ watches = [] }) => {
         : latest;
     }, null);
 
-    return { automatic, quartz, latestWatch: latestWatch?.watch || null };
+    return {
+      automatic,
+      quartz,
+      warranties,
+      latestWatch: latestWatch?.watch || null,
+    };
   }, [watches]);
 
   const items = [
-    { label: 'Orologi', value: watches.length, icon: Watch, progress: watches.length ? 1 : 0 },
+    { label: 'Orologi', value: watches.length, icon: Watch, progress: 1 },
     {
       label: 'Automatici',
       value: stats.automatic,
       icon: Cog,
       progress: watches.length ? stats.automatic / watches.length : 0,
+    },
+    {
+      label: 'In garanzia',
+      value: stats.warranties,
+      icon: ShieldCheck,
+      progress: watches.length ? stats.warranties / watches.length : 0,
     },
     {
       label: 'Quarzi',
@@ -34,16 +46,29 @@ const CollectionQuickStats = ({ watches = [] }) => {
 
   return (
     <section className="collection-quick-stats" aria-label="Statistiche della collezione">
-      <div className="collection-quick-stats__grid">
+      <div className="collection-quick-stats__panel">
         {items.map(({ label, value, icon, progress }) => (
           <article className="collection-quick-stats__item" key={label}>
-            <span
-              className="collection-quick-stats__ring"
-              style={{ '--stat-progress': `${progress * 360}deg` }}
-              aria-hidden="true"
+            <div
+              className="collection-quick-stats__circle"
+              role="img"
+              aria-label={`${label}: ${value}`}
             >
-              {createElement(icon, { size: 21, strokeWidth: 1.8 })}
-            </span>
+              <svg className="collection-quick-stats__progress" viewBox="0 0 64 64" aria-hidden="true">
+                <circle className="collection-quick-stats__track" cx="32" cy="32" r="28" />
+                <circle
+                  className="collection-quick-stats__value"
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  strokeDasharray={2 * Math.PI * 28}
+                  strokeDashoffset={2 * Math.PI * 28 * (1 - progress)}
+                />
+              </svg>
+              <span className="collection-quick-stats__circle-content">
+                {createElement(icon, { size: 19, strokeWidth: 1.8 })}
+              </span>
+            </div>
             <strong>{value}</strong>
             <span className="collection-quick-stats__label">{label}</span>
           </article>
