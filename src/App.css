@@ -5385,7 +5385,7 @@ a:focus-visible,
   min-height: clamp(600px, 36vw, 680px);
   margin: 0;
   padding: clamp(112px, 11vw, 154px) max(clamp(24px, 8vw, 150px), calc((100vw - 1600px) / 2))
-    clamp(72px, 7vw, 100px);
+    clamp(36px, 4vw, 52px);
   overflow-x: clip;
   overflow-y: visible;
   border-bottom: 0;
@@ -5762,8 +5762,8 @@ a:focus-visible,
   z-index: 2;
   width: 100vw;
   max-width: none;
-  margin: 18px 0 38px;
-  padding: 12px 0 10px;
+  margin: 8px 0 8px;
+  padding: 8px 0 6px;
   overflow: hidden;
   transform: translateX(-50%);
 }
@@ -5831,7 +5831,7 @@ a:focus-visible,
   box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  margin-top: 14px;
+  margin-top: 4px;
   margin-bottom: 4px;
   padding: 14px clamp(16px, 3vw, 36px);
 }
@@ -6056,7 +6056,7 @@ a:focus-visible,
     grid-template-rows: auto auto;
     row-gap: 24px;
     min-height: 0;
-    padding: 96px 26px 52px;
+    padding: 96px 26px 36px;
   }
 
   .hero-copy {
@@ -6101,8 +6101,8 @@ a:focus-visible,
   }
 
   .brand-strip {
-    margin-top: 10px;
-    margin-bottom: 28px;
+    margin-top: 6px;
+    margin-bottom: 8px;
     padding-inline: 26px;
   }
 
@@ -6114,8 +6114,8 @@ a:focus-visible,
 
 @media (max-width: 430px) {
   .hero-section {
-    padding: 82px 18px 42px;
-    row-gap: 30px;
+    padding: 82px 18px 28px;
+    row-gap: 24px;
   }
 
   .hero-section h1 {
