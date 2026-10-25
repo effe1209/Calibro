@@ -52,20 +52,47 @@ const makePrivateObjectPath = (userId, fileOrBlob) => {
   return `${userId}/private/${crypto.randomUUID()}.${extension}`;
 };
 
-export const getWatchImageUrl = async (imageValue) => {
-  const storageObject = getStorageObject(imageValue);
-  if (!storageObject) return null;
-  if (storageObject.url) return storageObject.url;
+export const getWatchImageUrls = async (imageValues) => {
+  const storageObjects = imageValues.map(getStorageObject);
+  const privatePaths = [...new Set(storageObjects
+    .filter((storageObject) => storageObject?.bucket === PRIVATE_WATCH_PHOTO_BUCKET)
+    .map((storageObject) => storageObject.path))];
+  const signedUrlsByPath = new Map();
 
-  if (storageObject.bucket === PRIVATE_WATCH_PHOTO_BUCKET) {
-    const { data, error } = await supabase.storage
-      .from(PRIVATE_WATCH_PHOTO_BUCKET)
-      .createSignedUrl(storageObject.path, SIGNED_URL_LIFETIME_SECONDS);
-    if (error) throw error;
-    return data.signedUrl;
+  if (privatePaths.length > 0) {
+    const privateBucket = supabase.storage.from(PRIVATE_WATCH_PHOTO_BUCKET);
+    for (let offset = 0; offset < privatePaths.length; offset += 100) {
+      const pathBatch = privatePaths.slice(offset, offset + 100);
+      const { data, error } = await privateBucket.createSignedUrls(
+        pathBatch,
+        SIGNED_URL_LIFETIME_SECONDS
+      );
+      if (error) throw error;
+
+      data.forEach(({ error: signingError, path, signedUrl }) => {
+        if (signingError || !path || !signedUrl) {
+          throw new Error(signingError || `Impossibile firmare la foto ${path || 'richiesta'}.`);
+        }
+        signedUrlsByPath.set(path, signedUrl);
+      });
+    }
   }
 
-  return supabase.storage.from(LEGACY_WATCH_PHOTO_BUCKET).getPublicUrl(storageObject.path).data.publicUrl;
+  return storageObjects.map((storageObject) => {
+    if (!storageObject) return null;
+    if (storageObject.url) return storageObject.url;
+    if (storageObject.bucket === PRIVATE_WATCH_PHOTO_BUCKET) {
+      const signedUrl = signedUrlsByPath.get(storageObject.path);
+      if (!signedUrl) throw new Error(`URL firmato non restituito per la foto ${storageObject.path}.`);
+      return signedUrl;
+    }
+    return supabase.storage.from(LEGACY_WATCH_PHOTO_BUCKET).getPublicUrl(storageObject.path).data.publicUrl;
+  });
+};
+
+export const getWatchImageUrl = async (imageValue) => {
+  const [imageUrl] = await getWatchImageUrls([imageValue]);
+  return imageUrl;
 };
 
 export const removeWatchImage = async (imageValue) => {

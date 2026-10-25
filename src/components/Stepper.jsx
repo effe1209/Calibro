@@ -1,5 +1,5 @@
 import React, { useState, Children, useRef, useLayoutEffect } from 'react';
-import { motion, AnimatePresence, color } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 import './componentCSS/Stepper.css';
 
@@ -105,7 +105,6 @@ export default function Stepper({
           currentStep={currentStep}
           direction={direction}
           className={`step-content-default ${contentClassName}`}
-          isDark={isDark}
         >
           {stepsArray[currentStep - 1]}
         </StepContentWrapper>
@@ -154,7 +153,7 @@ export default function Stepper({
   );
 }
 
-function StepContentWrapper({ isCompleted, currentStep, direction, children, className, isDark }) {
+function StepContentWrapper({ isCompleted, currentStep, direction, children, className }) {
   const [parentHeight, setParentHeight] = useState(0);
 
   return (

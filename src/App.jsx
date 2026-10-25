@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useTransition, useLayoutEffect, useMemo, useCallback } from "react";
+import React, { lazy, Suspense, useState, useEffect, useRef, useTransition, useMemo, useCallback } from "react";
 import { createPortal } from 'react-dom';
 import imageCompression from 'browser-image-compression';
 // Import Supabase e servizi (invariati)
@@ -6,18 +6,15 @@ import { supabase } from './components/supabaseClient';
 import { addWatchService } from './components/watchService';
 import {
   getWatchImageUrl,
+  getWatchImageUrls,
   removeWatchImage,
   uploadWatchImage,
 } from './components/imageService';
 import { downloadFullBackup, parseBackupFile, restoreFullBackup } from './components/backupService';
 import AuthForm from './components/AuthForm';
-import WatchAnalytics from './components/WatchAnalytics'; 
 import GlassSurface from './components/GlassSurface';
 import TiltedCard from './components/TiltedCard';
-import FloatingLines from './components/FloatingLines';
-import InfiniteGridModal from './components/InfiniteGridModal';
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import ColorThief from 'colorthief';
 import LogoLoop from './components/LogoLoop';
 
 // Importa i componenti dock e le icone VSC
@@ -37,7 +34,6 @@ import DayWatchModal from './components/DayWatchModal';
 import OutfitModal from './components/OutfitModal';
 import ModifyWatchModal from './components/ModifyWatchModal';
 import InfoWatchModal from './components/InfoWatchModal';
-import StatsModal from './components/StatsModal';
 import { matchesOutfitFilters } from './components/outfitPreferences';
 
 // Stili (invariati)
@@ -47,34 +43,27 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import "./App.css";
 
-const hasOutfitEmbedding = (embedding) => {
-  if (Array.isArray(embedding)) return embedding.length > 0;
-  if (typeof embedding === 'string') {
-    const normalizedEmbedding = embedding.trim();
-    return normalizedEmbedding.length > 2 && normalizedEmbedding !== 'null';
-  }
-  return embedding != null;
-};
+const FloatingLines = lazy(() => import('./components/FloatingLines'));
+const InfiniteGridModal = lazy(() => import('./components/InfiniteGridModal'));
+const StatsModal = lazy(() => import('./components/StatsModal'));
 
 function App() {
   // --- STATO (Resta qui) ---
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWatch, setSelectedWatch] = useState(null);
   const modifyBackHandlerRef = useRef(null);
+  const watchFetchRequestRef = useRef(0);
   const fileInputRef = useRef(null);
   const fileInputRefOutfit = useRef(null);
   const backupInputRef = useRef(null);
-  const colorInputRef = useRef(null);
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
   const [watches, setWatches] = useState([]);
-  const missingOutfitEmbeddingCount = useMemo(
-    () => watches.filter((watch) => watch.image && !hasOutfitEmbedding(watch.embedding)).length,
-    [watches]
-  );
+  const [missingOutfitEmbeddingIds, setMissingOutfitEmbeddingIds] = useState([]);
+  const missingOutfitEmbeddingCount = missingOutfitEmbeddingIds.length;
   const [maintenanceRefreshKey, setMaintenanceRefreshKey] = useState(0);
   const [watchConsigliati, setWatchConsigliati] = useState([]);
   const [outfitOccasion, setOutfitOccasion] = useState('all');
@@ -120,9 +109,8 @@ function App() {
   const [modifyWatchBaseline, setModifyWatchBaseline] = useState(null);
   const [isBackupBusy, setIsBackupBusy] = useState(false);
   const [allFeaturesList, setAllFeaturesList] = useState([]);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [modalTitle, setModalTitle] = useState(""); 
-  const [color, setColor] = useState("");
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
   const [isInfiniteGridVisible, setIsInfiniteGridVisible] = useState(false);
 
@@ -277,7 +265,7 @@ function App() {
     });
 
     return () => observer.disconnect();
-  }, [user, watches]);
+  }, [user]);
 
 
   // Effetti di scroll e anchor link
@@ -291,68 +279,14 @@ function App() {
       }
     };
     anchors.forEach(anchor => anchor.addEventListener("click", handleClick));
-    
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-                const sectionId = entry.target.id; 
-                const dockName = {
-                    'home': 'Home',
-                    'profile-section': 'Profile',
-                    'watch-list': 'Watches',
-                    'function': 'Functions'
-                }[sectionId] || activeSection; 
-                setActiveSection(dockName);
-            }
-        });
-    }, { threshold: 0.5 });
-
-    // Gestore per scroll blur
-    let timeout;
-    const handleScroll = () => {
-      const slideWrap = document.querySelector(".slideWrap");
-      if (!slideWrap) return;
-
-      if (window.scrollY > 30) {
-        slideWrap.style.backdropFilter = "blur(10px)";
-      } else {
-        slideWrap.style.backdropFilter = "blur(10px)";
-      }
-
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (window.scrollY === 0) {
-          slideWrap.style.backdropFilter = "blur(10px)";
-        }
-      }, 200);
-    };
-    window.addEventListener("scroll", handleScroll);
 
     return () => {
       anchors.forEach(anchor => anchor.removeEventListener("click", handleClick));
-      window.removeEventListener("scroll", handleScroll);
-      observer.disconnect();
-      clearTimeout(timeout);
     };
-  }, [activeSection]);
-
-
-  useLayoutEffect(() => {
-    console.log("Layout watches ricalcolato prima del paint.");
-  }, [watches]);
+  }, []);
 
   // Test connessione, fetch utente e caricamento email/nickname
   useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const { data, error } = await supabase.rpc("now");
-        if (error) console.error("Errore di connessione a Supabase:", error);
-        else console.log("Connessione a Supabase riuscita!");
-      } catch (err) {
-        console.error("Errore imprevisto durante la connessione:", err);
-      }
-    };
-
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -361,7 +295,6 @@ function App() {
       }
     };
     
-    testConnection();
     fetchUser();
 
     const savedNickname = localStorage.getItem('nickname');
@@ -497,8 +430,10 @@ function App() {
     try {
       const { error } = await supabase.auth.signOut({ scope: 'local' });
       if (error) throw error;
+      watchFetchRequestRef.current += 1;
       setUser(null);
       setWatches([]);
+      setMissingOutfitEmbeddingIds([]);
       setEmail('');
       setPassword('');
       setNickname('');
@@ -585,7 +520,11 @@ const handleAddWatch = async () => {
     try {
       const { error } = await supabase.from("watches").delete().eq("id", id);
       if (error) throw error;
+      watchFetchRequestRef.current += 1;
       setWatches(prevWatches => prevWatches.filter(watch => watch.id !== id));
+      setMissingOutfitEmbeddingIds((currentIds) => (
+        currentIds.filter((missingId) => String(missingId) !== String(id))
+      ));
       let cleanupWarning = false;
       if (imagePath) {
         try {
@@ -606,26 +545,49 @@ const handleAddWatch = async () => {
   };
 
 const fetchWatches = async (userid) => {
+  const requestId = ++watchFetchRequestRef.current;
   try {
-    const { data, error } = await supabase
-      .from("watches")
-      .select("*, Orologi_Caratteristiche(*, caratteristiche(*))") 
-      .eq("userid", userid);
+    const [
+      { data, error },
+      { data: watchesWithoutEmbeddings, error: embeddingsError },
+    ] = await Promise.all([
+      supabase
+        .from("watches")
+        .select("id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, Orologi_Caratteristiche(*, caratteristiche(*))")
+        .eq("userid", userid),
+      supabase
+        .from("watches")
+        .select("id")
+        .eq("userid", userid)
+        .not("image", "is", null)
+        .neq("image", "")
+        .is("embedding", null),
+    ]);
     if (error) throw error;
-    const userWatches = await Promise.all(data.map(async (watch) => {
+    if (embeddingsError) throw embeddingsError;
+    if (requestId !== watchFetchRequestRef.current) return false;
+
+    const watchRows = data || [];
+    const imageUrls = await getWatchImageUrls(watchRows.map((watch) => watch.image));
+    if (requestId !== watchFetchRequestRef.current) return false;
+
+    const userWatches = watchRows.map((watch, index) => {
       const features = (watch.Orologi_Caratteristiche || [])
         .map((joinEntry) => joinEntry?.caratteristiche)
         .filter(Boolean);
       return {
         ...watch,
         caratteristiche: features,
-        imageUrl: await getWatchImageUrl(watch.image),
+        imageUrl: imageUrls[index],
       };
-    }));
+    });
     setWatches(userWatches);
+    setMissingOutfitEmbeddingIds((watchesWithoutEmbeddings || []).map((watch) => watch.id));
     return true;
   } catch (error) {
-    setMessage("Errore durante il recupero degli orologi: " + error.message);
+    if (requestId === watchFetchRequestRef.current) {
+      setMessage("Errore durante il recupero degli orologi: " + error.message);
+    }
     return false;
   }
 };
@@ -700,7 +662,7 @@ const fetchWatches = async (userid) => {
     }
   };
   
-  const handleDayWatch = async (userid) => {
+  const handleDayWatch = async () => {
     try {
       if (watches && watches.length > 0) {
         const randomIndex = Math.floor(Math.random() * watches.length);
@@ -847,6 +809,15 @@ const fetchWatches = async (userid) => {
       setWatches(prevWatches => 
         prevWatches.map(w => w.id === modifyWatch.id ? locallyUpdatedWatch : w)
       );
+      if (image instanceof File) {
+        setMissingOutfitEmbeddingIds((currentIds) => (
+          finalWatchData.embedding == null
+            ? currentIds.some((id) => String(id) === String(modifyWatch.id))
+              ? currentIds
+              : [...currentIds, modifyWatch.id]
+            : currentIds.filter((id) => String(id) !== String(modifyWatch.id))
+        ));
+      }
 
       let imageCleanupWarning = false;
       if (uploadedImagePath && oldImagePath) {
@@ -1228,80 +1199,6 @@ const updateAllWatchEmbeddings = async () => {
   }
 };
 
- const rgbToHex = (r, g, b) => {
-    return "#" + [r, g, b]
-      .map(x => {
-        const hex = x.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-      })
-      .join("");
-  };
-
-  const calculateDistance = (rgb1, rgb2) => {
-    return Math.sqrt(
-      Math.pow(rgb1[0] - rgb2[0], 2) +
-      Math.pow(rgb1[1] - rgb2[1], 2) +
-      Math.pow(rgb1[2] - rgb2[2], 2)
-    );
-  };
-
-  const searchWatchesByPalette = (palette) => {
-    // palette è un array tipo: [[255,0,0], [0,255,0], ...]
-
-    const sortedWatches = watches.map((watch) => {
-        // Convertiamo il colore dell'orologio da Hex a RGB Array
-        const hex = watch.color.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        const watchRgb = [r, g, b];
-
-        // QUI C'È L'INTELLIGENZA:
-        // Invece di confrontare con un solo colore, troviamo la "distanza minima"
-        // tra questo orologio e QUALSIASI colore presente nella palette dell'outfit.
-        // Se l'outfit ha 5 colori, vediamo con quale di questi l'orologio sta meglio.
-        const minDistance = palette.reduce((min, outfitColor) => {
-          const dist = calculateDistance(watchRgb, outfitColor);
-          return dist < min ? dist : min;
-        }, Infinity);
-
-        return {
-          ...watch,
-          distanza: minDistance, // Usiamo la distanza migliore trovata
-        };
-      })
-      .sort((a, b) => a.distanza - b.distanza) // Ordiniamo dal più simile al meno simile
-      .slice(0, 3); // Prendiamo i top 3
-
-    setWatchConsigliati(sortedWatches);
-    setIsCarouselVisible(true);
-  };
-
-  const searchWatchesByColor = (hexColor) => {
-    const r = parseInt(hexColor.substring(1, 3), 16);
-    const g = parseInt(hexColor.substring(3, 5), 16);
-    const b = parseInt(hexColor.substring(5, 7), 16);
-  
-    const calculateDistance = (colorHex) => {
-      if (!colorHex) return Infinity; 
-      const r2 = parseInt(colorHex.substring(1, 3), 16);
-      const g2 = parseInt(colorHex.substring(3, 5), 16);
-      const b2 = parseInt(colorHex.substring(5, 7), 16);
-      return Math.sqrt((r - r2) ** 2 + (g - g2) ** 2 + (b - b2) ** 2);
-    };
-  
-    const sortedWatches = watches
-      .map((watch) => ({
-        ...watch,
-        distanza: calculateDistance(watch.color),
-      }))
-      .sort((a, b) => a.distanza - b.distanza)
-      .slice(0, 3);
-  
-    setWatchConsigliati(sortedWatches);
-    setIsCarouselVisible(true);
-  };
-
   // --- LOGICA FEATURES (Funzioni) ---
   const handleFeatureChange = (event) => {
     const { value, checked } = event.target;
@@ -1422,9 +1319,11 @@ const watchBrands = useMemo(() => [
     || isCarouselVisible
     || isInfiniteGridVisible;
 
-  const floatingConfig = isDark 
-    ? {bg: "#091522", gradient: ["#F4C878"], blend: "screen"}
-    : {bg: "#e9f0f4", gradient: ["#4f91a0", "#b56e93"], blend: "multiply"};
+  const floatingConfig = useMemo(() => (
+    isDark
+      ? { bg: "#091522", gradient: ["#F4C878"], blend: "screen" }
+      : { bg: "#e9f0f4", gradient: ["#4f91a0", "#b56e93"], blend: "multiply" }
+  ), [isDark]);
 
 
 const BackgroundLayer = useMemo(() => {
@@ -1433,21 +1332,25 @@ const BackgroundLayer = useMemo(() => {
             backgroundColor: floatingConfig.bg,
             transition: "background-color 0.6s ease",
         }}>
-          {!isCompactViewport && <FloatingLines
-            linesGradient={floatingConfig.gradient}
-            mixBlendMode={floatingConfig.blend}
-            enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={[3, 3, 2]}
-            lineDistance={[8, 6, 4]}
-            animationSpeed={0.55}
-            bendRadius={5.0}
-            bendStrength={-0.5}
-            interactive={false} 
-            parallax={false}
-          />}
+          {!isCompactViewport && (
+            <Suspense fallback={null}>
+              <FloatingLines
+                linesGradient={floatingConfig.gradient}
+                mixBlendMode={floatingConfig.blend}
+                enabledWaves={['top', 'middle', 'bottom']}
+                lineCount={[3, 3, 2]}
+                lineDistance={[8, 6, 4]}
+                animationSpeed={0.55}
+                bendRadius={5.0}
+                bendStrength={-0.5}
+                interactive={false}
+                parallax={false}
+              />
+            </Suspense>
+          )}
         </div>
       );
-    }, [isDark, isCompactViewport, floatingConfig.bg, floatingConfig.blend]);
+    }, [isCompactViewport, floatingConfig]);
 
   // --- RENDER ---
   return (
@@ -1697,7 +1600,7 @@ const BackgroundLayer = useMemo(() => {
           <div id="function-section">
             <h2 style={{paddingBottom:"2%"}} id="function">Funzioni</h2>
             <FunctionsSection
-              onDayWatchClick={() => handleDayWatch(user.id)}
+              onDayWatchClick={handleDayWatch}
               onOutfitImageChange={handleImageUpload}
               fileInputRefOutfit={fileInputRefOutfit}
               outfitOccasion={outfitOccasion}
@@ -1774,12 +1677,16 @@ const BackgroundLayer = useMemo(() => {
           </div>
         </>
       )}
-          <StatsModal
-            isVisible={isStatisticheVisible}
-            setIsVisible={setIsStatisticheVisible}
-            watches={watches}
-            isDark={isDark}
-          />
+          {isStatisticheVisible && (
+            <Suspense fallback={null}>
+              <StatsModal
+                isVisible={isStatisticheVisible}
+                setIsVisible={setIsStatisticheVisible}
+                watches={watches}
+                isDark={isDark}
+              />
+            </Suspense>
+          )}
           <InfoWatchModal
             isVisible={isInfoVisible}
             setIsVisible={setIsInfoVisible}
@@ -1789,14 +1696,18 @@ const BackgroundLayer = useMemo(() => {
             userId={user?.id}
             onMaintenanceChanged={handleMaintenanceChanged}
           />
-          <InfiniteGridModal 
-            isVisible={isInfiniteGridVisible} 
-            setIsVisible={setIsInfiniteGridVisible} 
-            handleInfoWatch={handleInfoWatch}
-            isDark={isDark}
-            watches={watches} // Passa la lista completa degli orologi
-            handleFavoriteToggle={handleFavoriteToggle}
-          />
+          {isInfiniteGridVisible && (
+            <Suspense fallback={null}>
+              <InfiniteGridModal
+                isVisible={isInfiniteGridVisible}
+                setIsVisible={setIsInfiniteGridVisible}
+                handleInfoWatch={handleInfoWatch}
+                isDark={isDark}
+                watches={watches}
+                handleFavoriteToggle={handleFavoriteToggle}
+              />
+            </Suspense>
+          )}
     </div>
     </>
   );

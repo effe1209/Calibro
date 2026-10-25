@@ -1,7 +1,7 @@
 
 const featuresList = ["Datario", "Cronografo", "Impermeabile", "Automatico", "Subacqueo"];
 
-function WatchDetails({ newWatch, setNewWatch }) {
+function FeaturesDropdown({ newWatch, setNewWatch }) {
   const handleFeatureChange = (event) => {
     const { value, checked } = event.target;
 

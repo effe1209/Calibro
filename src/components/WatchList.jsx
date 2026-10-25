@@ -30,7 +30,11 @@ const getWatchFeatures = (watch) => {
 
 const csvCell = (value) => {
   let text = String(value ?? '');
-  if (/^[\u0000-\u0020]*[=+\-@]/.test(text)) text = `'${text}`;
+  let firstNonWhitespace = 0;
+  while (firstNonWhitespace < text.length && text.charCodeAt(firstNonWhitespace) <= 0x20) {
+    firstNonWhitespace += 1;
+  }
+  if (/[=+\-@]/.test(text[firstNonWhitespace] || '')) text = `'${text}`;
   return `"${text.replace(/"/g, '""')}"`;
 };
 
@@ -533,4 +537,3 @@ const WatchList = ({
 };
 
 export default WatchList;
-
