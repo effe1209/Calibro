@@ -6,6 +6,7 @@ import WatchOccasionSelector from './WatchOccasionSelector';
 const ModifyWatchModal = ({
   isVisible,
   setIsVisible,
+  onBackHandlerChange,
   initialWatch,
   fileInputRef,
   allFeaturesList,
@@ -41,6 +42,21 @@ const ModifyWatchModal = ({
     }
     setIsVisible(false);
   }, [hasUnsavedChanges, setIsVisible]);
+
+  const handleBackRequest = useCallback(() => {
+    if (showExitPrompt) {
+      setShowExitPrompt(false);
+      return;
+    }
+    requestClose();
+  }, [requestClose, showExitPrompt]);
+
+  useEffect(() => {
+    if (!isVisible) return undefined;
+
+    onBackHandlerChange?.(handleBackRequest);
+    return () => onBackHandlerChange?.(null);
+  }, [handleBackRequest, isVisible, onBackHandlerChange]);
 
   const handleModifyImageChange = (event) => {
     const file = event.target.files?.[0];

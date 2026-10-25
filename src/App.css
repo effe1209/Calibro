@@ -4404,6 +4404,7 @@ a:focus-visible,
   letter-spacing: -0.055em;
   line-height: 1.1;
   text-align: left;
+  padding-left: 0px;
 }
 
 .statistics-heading p {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useTransition, useLayoutEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef, useTransition, useLayoutEffect, useMemo, useCallback } from "react";
 import { createPortal } from 'react-dom';
 import imageCompression from 'browser-image-compression';
 // Import Supabase e servizi (invariati)
@@ -55,6 +55,7 @@ function App() {
   // --- STATO (Resta qui) ---
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWatch, setSelectedWatch] = useState(null);
+  const modifyBackHandlerRef = useRef(null);
   const fileInputRef = useRef(null);
   const fileInputRefOutfit = useRef(null);
   const backupInputRef = useRef(null);
@@ -119,6 +120,88 @@ function App() {
   const [color, setColor] = useState("");
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
   const [isInfiniteGridVisible, setIsInfiniteGridVisible] = useState(false);
+
+  const registerModifyBackHandler = useCallback((handler) => {
+    modifyBackHandlerRef.current = handler;
+  }, []);
+
+  const handleBackGesture = useCallback(() => {
+    if (loading) return;
+
+    if (isInfiniteGridVisible) {
+      setIsInfiniteGridVisible(false);
+    } else if (isStatisticheVisible) {
+      setIsStatisticheVisible(false);
+    } else if (isInfoVisible) {
+      setIsInfoVisible(false);
+    } else if (isModifyVisible) {
+      modifyBackHandlerRef.current?.();
+    } else if (isModalVisible) {
+      setIsModalVisible(false);
+    } else if (isCarouselVisible) {
+      setIsCarouselVisible(false);
+      if (fileInputRefOutfit.current) fileInputRefOutfit.current.value = "";
+      setWatchConsigliati([]);
+    } else if (isDetailsMenuOpen) {
+      setIsDetailsMenuOpen(false);
+    } else if (showForm) {
+      setShowForm(false);
+    }
+  }, [
+    isInfiniteGridVisible,
+    isStatisticheVisible,
+    isInfoVisible,
+    isModifyVisible,
+    isModalVisible,
+    isCarouselVisible,
+    isDetailsMenuOpen,
+    showForm,
+    loading,
+  ]);
+
+  useEffect(() => {
+    let touchStart = null;
+
+    const handleTouchStart = (event) => {
+      if (event.touches.length !== 1) {
+        touchStart = null;
+        return;
+      }
+
+      const touch = event.touches[0];
+      touchStart = touch.clientX <= 24
+        ? { x: touch.clientX, y: touch.clientY }
+        : null;
+    };
+
+    const handleTouchEnd = (event) => {
+      if (!touchStart || event.changedTouches.length !== 1) {
+        touchStart = null;
+        return;
+      }
+
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = Math.abs(touch.clientY - touchStart.y);
+      touchStart = null;
+
+      if (deltaX >= 80 && deltaX > deltaY * 1.4) handleBackGesture();
+    };
+
+    const clearTouchStart = () => {
+      touchStart = null;
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { capture: true, passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { capture: true, passive: true });
+    window.addEventListener('touchcancel', clearTouchStart, { capture: true, passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart, true);
+      window.removeEventListener('touchend', handleTouchEnd, true);
+      window.removeEventListener('touchcancel', clearTouchStart, true);
+    };
+  }, [handleBackGesture]);
 
   const toggleAddWatchForm = () => setShowForm((isVisible) => !isVisible);
 
@@ -1656,6 +1739,7 @@ const BackgroundLayer = useMemo(() => {
             key={isModifyVisible ? modifyWatch?.id : 'closed'}
             isVisible={isModifyVisible}
             setIsVisible={setIsModifyVisible}
+            onBackHandlerChange={registerModifyBackHandler}
             initialWatch={modifyWatchBaseline}
             fileInputRef={fileInputRef} 
             allFeaturesList={allFeaturesList}
