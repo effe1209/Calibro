@@ -5680,7 +5680,7 @@ a:focus-visible,
   border: 1px solid var(--ui-border);
   border-radius: 32px;
   background: color-mix(in srgb, var(--ui-surface-strong) 40%, transparent);
-  box-shadow: 0 2px 8px rgba(28, 54, 71, 0.04);
+  /*box-shadow: 0 2px 8px rgba(28, 54, 71, 0.04);*/
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
 }
@@ -5759,7 +5759,7 @@ a:focus-visible,
   border: 1px solid color-mix(in srgb, var(--ui-border) 80%, transparent);
   border-radius: 16px;
   background: color-mix(in srgb, var(--ui-surface-strong) 30%, transparent);
-  box-shadow: 0 2px 8px rgba(28, 54, 71, 0.035);
+  /*box-shadow: 0 2px 8px rgba(28, 54, 71, 0.035);*/
   -webkit-backdrop-filter: blur(16px) saturate(130%);
   backdrop-filter: blur(16px) saturate(130%);
 }
@@ -5832,11 +5832,11 @@ a:focus-visible,
 }
 
 .dark-mode .collection-quick-stats__panel {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);*/
 }
 
 .dark-mode .collection-quick-stats__latest-card {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+  /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);*/
 }
 
 /* La fascia dei marchi resta a tutta larghezza sotto il hero. */
