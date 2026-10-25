@@ -43,7 +43,7 @@
 }
 
 .banner {
-  padding: 20px;
+  padding: 16px;
 }
 
 .form {
@@ -1722,7 +1722,7 @@ input::placeholder {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   width: min(100%, 520px);
 }
 
@@ -5660,7 +5660,7 @@ a:focus-visible,
 
 .collection-quick-stats {
   width: min(100%, 384px);
-  margin: 24px auto 0;
+  margin: 14px auto 0;
 }
 
 .collection-quick-stats__stack {
@@ -5755,7 +5755,7 @@ a:focus-visible,
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 12px 20px;
+  padding: 9px 14px;
   border: 1px solid color-mix(in srgb, var(--ui-border) 80%, transparent);
   border-radius: 16px;
   background: color-mix(in srgb, var(--ui-surface-strong) 30%, transparent);
@@ -5915,9 +5915,24 @@ a:focus-visible,
   box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  margin-top: 14px;
+  margin-bottom: 20px;
+  padding: 14px clamp(16px, 3vw, 36px);
+}
+
+.profile-info-content > .circular-text-container {
+  height: 112px;
+  margin-bottom: 4px;
+}
+
+.profile-info-content > .Saluti {
+  margin: 0 0 2px;
+  padding-bottom: 0;
 }
 
 .profile-info-content > .profile-collection-value {
+  margin-top: 4px;
+  padding: 9px 16px 10px !important;
   border: 1px solid var(--ui-border);
   background: var(--ui-surface-strong);
   box-shadow: 0 14px 32px rgba(24, 47, 60, 0.12), inset 0 1px rgba(255, 255, 255, 0.7);
@@ -5937,7 +5952,7 @@ a:focus-visible,
 .notification-settings {
   box-sizing: border-box;
   width: min(100%, 420px);
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   overflow: hidden;
   border: 1px solid var(--ui-border);
   border-radius: 17px;
@@ -5952,7 +5967,7 @@ a:focus-visible,
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 9px 12px;
 }
 
 .notification-settings__summary h5 {
