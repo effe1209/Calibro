@@ -1396,6 +1396,9 @@ const BackgroundLayer = useMemo(() => {
     >
       <SpeedInsights/>
       <div className="hero-account-backdrop">
+        {/*
+        Video della home disattivato per evitare download e decodifica durante il caricamento.
+        Per riattivarlo, rimuovere questo commento e ripristinare il controllo isCompactViewport.
         {!isCompactViewport && (
           <div className="hero-account-video-mask" aria-hidden="true">
             <video className="hero-account-video" autoPlay loop muted playsInline preload="auto" tabIndex={-1}>
@@ -1404,6 +1407,7 @@ const BackgroundLayer = useMemo(() => {
             </video>
           </div>
         )}
+        */}
         <div className="hero-account-content">
       <div id="home-section" className="hero-section">
         <figure className={`hero-watch${isDark ? ' is-dark' : ''}`}>

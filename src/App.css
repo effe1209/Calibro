@@ -3879,13 +3879,20 @@ a:focus-visible,
   letter-spacing: -0.04em;
 }
 
-.modify-watch-modal .modal-image {
+.modify-watch-image-upload {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.modify-watch-image-preview {
   display: block;
-  width: min(100%, 150px);
-  max-width: 150px;
-  max-height: 118px;
-  margin: 0 auto 18px;
-  border-radius: 16px;
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--ui-surface);
   object-fit: contain;
 }
 
@@ -4078,10 +4085,14 @@ a:focus-visible,
     grid-column: 1;
   }
 
-  .modify-watch-modal .modal-image {
-    width: 104px;
-    max-height: 86px;
-    margin-bottom: 12px;
+  .modify-watch-image-upload {
+    flex-wrap: wrap;
+  }
+
+  .modify-watch-image-preview {
+    width: 72px;
+    height: 72px;
+    flex-basis: 72px;
   }
 
   .modify-watch-modal > .buttonForm {

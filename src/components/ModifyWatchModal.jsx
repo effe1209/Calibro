@@ -136,14 +136,6 @@ const ModifyWatchModal = ({
       >
         <h2 id="modify-watch-title">Modifica Orologio</h2>
         
-        <img 
-          src={previewImageUrl} 
-          alt="Anteprima" 
-          className="modal-image" 
-          loading="lazy"
-          onError={(e) => { e.target.src = "orologio_back.svg"; }}
-        />
-        
         <div className="formModify modify-watch-form">
           <div className="modify-watch-field">
             <label>Nome: </label>
@@ -275,9 +267,18 @@ const ModifyWatchModal = ({
               className="hidden-input"
               id="file-upload-modify" // ID univoco
             />
-            <button type="button" className="upload-button" onClick={() => fileInputRef.current.click()}>
-              📸 Sostituisci immagine
-            </button>
+            <div className="modify-watch-image-upload">
+              <img
+                src={previewImageUrl}
+                alt="Anteprima immagine orologio"
+                className="modify-watch-image-preview"
+                loading="lazy"
+                onError={(event) => { event.currentTarget.src = 'orologio_back.svg'; }}
+              />
+              <button type="button" className="upload-button" onClick={() => fileInputRef.current?.click()}>
+                📸 Sostituisci immagine
+              </button>
+            </div>
           </div>
           <ExternalImageProcessingNotice />
 
