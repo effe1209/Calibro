@@ -28,6 +28,7 @@ import UserProfile from './components/UserProfile';
 import NotificationSettings from './components/NotificationSettings';
 import DarkModeSwitch from './components/DarkModeSwitch';
 import WatchList from './components/WatchList';
+import CollectionQuickStats from './components/CollectionQuickStats';
 import AddWatchForm from './components/AddWatchForm';
 import FunctionsSection from './components/FunctionsSection';
 import DayWatchModal from './components/DayWatchModal';
@@ -555,7 +556,7 @@ const fetchWatches = async (userid) => {
     ] = await Promise.all([
       supabase
         .from("watches")
-        .select("id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, Orologi_Caratteristiche(*, caratteristiche(*))")
+        .select("id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, created_at, Orologi_Caratteristiche(*, caratteristiche(*))")
         .eq("userid", userid),
       supabase
         .from("watches")
@@ -1492,6 +1493,7 @@ const BackgroundLayer = useMemo(() => {
           <a className="hero-cta" href="#watch-list-section">
             Esplora la collezione <span aria-hidden="true">→</span>
           </a>
+          {user && <CollectionQuickStats watches={watches} />}
         </div>
       </div>
 

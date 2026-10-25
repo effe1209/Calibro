@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "migrate:watch-photos": "node scripts/migrate-watch-photos.mjs",
     "preview": "vite preview",
     "deploy": "vite build && gh-pages -d dist"
   },

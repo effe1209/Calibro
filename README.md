@@ -37,7 +37,7 @@ Le foto degli orologi sono conservate nel bucket privato `watch-photos-private`;
 
 1. Applica le migration SQL in `supabase/migrations/` in ordine cronologico, inclusa `20261025_security_hardening.sql`.
 2. Distribuisci la nuova versione dell’app.
-3. Migra le foto già esistenti dal bucket pubblico impostando `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nell’ambiente e avviando `node scripts/migrate-watch-photos.mjs`.
+3. Esegui un backup del database e dei file Storage, poi migra le foto esistenti impostando `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nell’ambiente e avviando `npm run migrate:watch-photos`.
 
 La chiave `SUPABASE_SERVICE_ROLE_KEY` è privilegiata: usala solo in un ambiente amministrativo sicuro e non inserirla nel repository o nelle variabili `VITE_*`. Lo script sposta le foto associate alle schede orologio, aggiorna i riferimenti, trasferisce in privato anche gli altri file nelle cartelle utente e rimuove le copie pubbliche; lascia intatti gli sfondi nella cartella principale. Le immagini esterne o le copie pubbliche non rimosse vengono segnalate e richiedono verifica manuale.
 
