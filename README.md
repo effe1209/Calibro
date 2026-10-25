@@ -29,7 +29,7 @@ Calibro è un'applicazione web moderna e responsiva progettata per gli appassion
 - Promemoria configurabili: Avvisi in app per garanzie e revisioni in scadenza, con anticipo personalizzabile e possibilità di nasconderli.
 - Backup completo: Esportazione e ripristino incrementale di orologi, revisioni, immagini, preferenze outfit e notifiche.
 
-Il backup completo è un file JSON autonomo con le immagini incluse. Il ripristino unisce i dati: aggiorna i record con lo stesso identificativo di backup e lascia inalterati gli altri. Per usare dotazione, garanzia, revisioni e backup, applica la migrazione `supabase/migrations/20261022_watch_collection_extensions.sql`; applica anche `supabase/migrations/20261023_watch_condition_rating.sql`, `supabase/migrations/20261023_watch_outfit_preferences.sql` e `supabase/migrations/20261023_watch_purchase_notifications.sql` per condizione, occasioni d’uso, preferenze outfit, dati di acquisto e avvisi.
+Il backup completo è un file JSON autonomo con le immagini incluse. Il ripristino unisce i dati: aggiorna i record con lo stesso identificativo di backup e lascia inalterati gli altri.
 
 ## 🧠 Funzioni Intelligenti e Interattive
 - Valore della collezione: Confronto tra spesa d’acquisto e valore dichiarato, con andamento degli acquisti per anno.
@@ -110,7 +110,7 @@ Linee guida rapide:
 | Name | Role |
 | --- | --- |
 | [effe1209](https://github.com/effe1209) | 👨‍💻 Mantainer, Code |
-| [altroUtente](https://github.com/altroUtente) | 📝 Documentazione |
+<!--| [altroUtente](https://github.com/altroUtente) | 📝 Documentazione |-->
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
