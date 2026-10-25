@@ -1,21 +1,21 @@
 import { useMemo } from 'react';
-import { BatteryCharging, Cog, Watch } from 'lucide-react';
+import { Clock, Zap } from 'lucide-react';
 
 const CollectionQuickStats = ({ watches = [] }) => {
   const stats = useMemo(() => {
-    const latestWatch = watches.reduce((latest, watch) => {
+    const latest = watches.reduce((currentLatest, watch) => {
       const createdAt = Date.parse(watch.created_at || '');
-      if (!Number.isFinite(createdAt)) return latest;
-      return !latest || createdAt > latest.createdAt
+      if (!Number.isFinite(createdAt)) return currentLatest;
+      return !currentLatest || createdAt > currentLatest.createdAt
         ? { watch, createdAt }
-        : latest;
+        : currentLatest;
     }, null);
 
     return {
       automatic: watches.filter((watch) => watch.movement === 'Automatico').length,
       quartz: watches.filter((watch) => watch.movement === 'Quarzo').length,
-      latestWatch: latestWatch?.watch || null,
-      latestCreatedAt: latestWatch?.createdAt || null,
+      latestWatch: latest?.watch || null,
+      latestCreatedAt: latest?.createdAt || null,
     };
   }, [watches]);
 
@@ -24,7 +24,6 @@ const CollectionQuickStats = ({ watches = [] }) => {
       .filter((value) => typeof value === 'string' && value.trim())
       .join(' ')
     : null;
-
   const latestDate = stats.latestCreatedAt
     ? new Intl.DateTimeFormat('it-IT', {
       day: 'numeric',
@@ -32,36 +31,64 @@ const CollectionQuickStats = ({ watches = [] }) => {
       year: 'numeric',
     }).format(stats.latestCreatedAt)
     : null;
+  const ringCircumference = 2 * Math.PI * 25;
+  const quartzProgress = watches.length ? stats.quartz / watches.length : 0;
 
   return (
     <section className="collection-quick-stats" aria-label="Statistiche della collezione">
       <div className="collection-quick-stats__panel">
-        <div className="collection-quick-stats__heading">
-          <Watch size={19} strokeWidth={1.8} aria-hidden="true" />
-          <h2>La tua collezione</h2>
-        </div>
-
-        <div className="collection-quick-stats__metrics">
-          <article className="collection-quick-stats__metric collection-quick-stats__metric--total">
-            <strong>{watches.length}</strong>
-            <span>Orologi</span>
-          </article>
-          <article className="collection-quick-stats__metric">
-            <Cog size={17} strokeWidth={1.8} aria-hidden="true" />
-            <strong>{stats.automatic}</strong>
-            <span>Automatici</span>
-          </article>
-          <article className="collection-quick-stats__metric">
-            <BatteryCharging size={17} strokeWidth={1.8} aria-hidden="true" />
-            <strong>{stats.quartz}</strong>
-            <span>Al quarzo</span>
-          </article>
-        </div>
-
         <div className="collection-quick-stats__latest">
-          <span>{latestWatchName ? 'Ultimo aggiunto' : 'Inizia la tua collezione'}</span>
-          <strong>{latestWatchName || 'Aggiungi il tuo primo orologio'}</strong>
-          {latestDate && <time dateTime={new Date(stats.latestCreatedAt).toISOString()}>{latestDate}</time>}
+          <div className="collection-quick-stats__latest-label">
+            <Clock size={14} aria-hidden="true" />
+            <span>{latestWatchName ? 'Ultimo aggiunto' : 'La tua collezione'}</span>
+          </div>
+          <strong>{latestWatchName || 'Nessun orologio aggiunto'}</strong>
+          {latestDate && (
+            <time dateTime={new Date(stats.latestCreatedAt).toISOString()}>
+              {latestDate}
+            </time>
+          )}
+        </div>
+
+        <div className="collection-quick-stats__circles" aria-label="Riepilogo orologi">
+          <div
+            className="collection-quick-stats__circle collection-quick-stats__circle--total"
+            role="img"
+            aria-label={`${watches.length} orologi in totale`}
+          >
+            <strong>{watches.length}</strong>
+            <span>Tot</span>
+          </div>
+          <div
+            className="collection-quick-stats__circle collection-quick-stats__circle--automatic"
+            role="img"
+            aria-label={`${stats.automatic} orologi automatici`}
+          >
+            <strong>{stats.automatic}</strong>
+            <span>Auto</span>
+          </div>
+          <div
+            className="collection-quick-stats__circle collection-quick-stats__circle--quartz"
+            role="img"
+            aria-label={`${stats.quartz} orologi al quarzo`}
+          >
+            <svg viewBox="0 0 56 56" aria-hidden="true">
+              <circle className="collection-quick-stats__ring-track" cx="28" cy="28" r="25" />
+              <circle
+                className="collection-quick-stats__ring-progress"
+                cx="28"
+                cy="28"
+                r="25"
+                strokeDasharray={ringCircumference}
+                strokeDashoffset={ringCircumference * (1 - quartzProgress)}
+              />
+            </svg>
+            <strong>{stats.quartz}</strong>
+            <span>Qrz</span>
+            <span className="collection-quick-stats__zap">
+              <Zap size={12} aria-hidden="true" />
+            </span>
+          </div>
         </div>
       </div>
     </section>
