@@ -1493,7 +1493,6 @@ const BackgroundLayer = useMemo(() => {
           <a className="hero-cta" href="#watch-list-section">
             Esplora la collezione <span aria-hidden="true">→</span>
           </a>
-          {user && <CollectionQuickStats watches={watches} />}
         </div>
       </div>
 
@@ -1575,6 +1574,7 @@ const BackgroundLayer = useMemo(() => {
                 <small>Spesa di acquisto: {collectionTotals.purchaseSpend.toLocaleString('it-IT')} €</small>
               </p>
               <NotificationSettings userId={user?.id} />
+              <CollectionQuickStats watches={watches} />
             </div>
           </div>
       )}

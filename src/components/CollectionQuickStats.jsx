@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { createElement, useMemo } from 'react';
+import { BatteryCharging, Cog, Watch } from 'lucide-react';
 
 const CollectionQuickStats = ({ watches = [] }) => {
   const stats = useMemo(() => {
@@ -16,19 +17,36 @@ const CollectionQuickStats = ({ watches = [] }) => {
   }, [watches]);
 
   const items = [
-    { label: 'Orologi', value: watches.length },
-    { label: 'Automatici', value: stats.automatic },
-    { label: 'Quarzi', value: stats.quartz },
+    { label: 'Orologi', value: watches.length, icon: Watch, progress: watches.length ? 1 : 0 },
+    {
+      label: 'Automatici',
+      value: stats.automatic,
+      icon: Cog,
+      progress: watches.length ? stats.automatic / watches.length : 0,
+    },
+    {
+      label: 'Quarzi',
+      value: stats.quartz,
+      icon: BatteryCharging,
+      progress: watches.length ? stats.quartz / watches.length : 0,
+    },
   ];
 
   return (
     <section className="collection-quick-stats" aria-label="Statistiche della collezione">
       <div className="collection-quick-stats__grid">
-        {items.map(({ label, value }) => (
-          <div className="collection-quick-stats__item" key={label}>
-            <span>{label}</span>
+        {items.map(({ label, value, icon, progress }) => (
+          <article className="collection-quick-stats__item" key={label}>
+            <span
+              className="collection-quick-stats__ring"
+              style={{ '--stat-progress': `${progress * 360}deg` }}
+              aria-hidden="true"
+            >
+              {createElement(icon, { size: 21, strokeWidth: 1.8 })}
+            </span>
             <strong>{value}</strong>
-          </div>
+            <span className="collection-quick-stats__label">{label}</span>
+          </article>
         ))}
       </div>
       <p className="collection-quick-stats__latest">
