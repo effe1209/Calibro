@@ -4913,7 +4913,7 @@ a:focus-visible,
 }
 
 #function-section .function-card__copy p {
-  max-width: 35ch;
+  max-width: 100ch;
   margin: 0;
   color: var(--ui-muted);
   font-size: 0.88rem;
