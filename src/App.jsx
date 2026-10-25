@@ -1573,7 +1573,7 @@ const BackgroundLayer = useMemo(() => {
                 <strong>{collectionTotals.declaredValue.toLocaleString('it-IT')} €</strong>
                 <small>Spesa di acquisto: {collectionTotals.purchaseSpend.toLocaleString('it-IT')} €</small>
               </p>
-              <NotificationSettings userId={user?.id} />
+              <NotificationSettings userId={user?.id} watches={watches} />
               <CollectionQuickStats watches={watches} />
             </div>
           </div>

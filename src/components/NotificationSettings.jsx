@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Clock } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
@@ -7,7 +8,7 @@ import {
   normalizeNotificationPreferences,
 } from './notificationPreferences';
 
-const NotificationSettings = ({ userId }) => {
+const NotificationSettings = ({ userId, watches = [] }) => {
   const [preferences, setPreferences] = useState(DEFAULT_NOTIFICATION_PREFERENCES);
   const [draftPreferences, setDraftPreferences] = useState(DEFAULT_NOTIFICATION_PREFERENCES);
   const [isOpen, setIsOpen] = useState(false);
@@ -88,6 +89,20 @@ const NotificationSettings = ({ userId }) => {
 
   if (!userId) return null;
 
+  const latestWatch = watches.reduce((latest, watch) => {
+    const createdAt = Date.parse(watch.created_at || '');
+    if (!Number.isFinite(createdAt)) return latest;
+    return !latest || createdAt > latest.createdAt ? { watch, createdAt } : latest;
+  }, null);
+  const latestWatchName = latestWatch
+    ? [latestWatch.watch.brand, latestWatch.watch.name]
+      .filter((value) => typeof value === 'string' && value.trim())
+      .join(' ')
+    : null;
+  const latestDate = latestWatch
+    ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(latestWatch.createdAt)
+    : null;
+
   return (
     <section className="notification-settings" aria-label="Impostazioni avvisi">
       <div className="notification-settings__summary">
@@ -104,6 +119,17 @@ const NotificationSettings = ({ userId }) => {
         >
           {isLoading ? 'Carico…' : isOpen ? 'Chiudi' : 'Impostazioni'}
         </button>
+      </div>
+
+      <div className="notification-settings__latest">
+        <span className="notification-settings__latest-icon">
+          <Clock size={16} aria-hidden="true" />
+        </span>
+        <div className="notification-settings__latest-copy">
+          <span>{latestWatchName ? 'Ultimo aggiunto' : 'La tua collezione'}</span>
+          <strong>{latestWatchName || 'Nessun orologio aggiunto'}</strong>
+        </div>
+        {latestDate && <time dateTime={new Date(latestWatch.createdAt).toISOString()}>{latestDate}</time>}
       </div>
 
       {isOpen && (
