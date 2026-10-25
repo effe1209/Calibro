@@ -5680,24 +5680,13 @@ a:focus-visible,
   gap: 5px;
   padding: 17px 19px 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--ui-border);
   border-radius: 26px;
-  color: #231d23;
-  box-shadow: 0 18px 42px rgba(37, 30, 45, 0.12), inset 0 1px rgba(255, 255, 255, 0.48);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  backdrop-filter: blur(20px) saturate(150%);
-}
-
-.collection-quick-stats__item:nth-child(1) {
-  background: linear-gradient(145deg, rgba(242, 158, 197, 0.94), rgba(255, 96, 112, 0.94));
-}
-
-.collection-quick-stats__item:nth-child(2) {
-  background: linear-gradient(145deg, rgba(255, 137, 102, 0.95), rgba(255, 195, 75, 0.96));
-}
-
-.collection-quick-stats__item:nth-child(3) {
-  background: linear-gradient(145deg, rgba(135, 191, 246, 0.94), rgba(183, 157, 245, 0.96));
+  background: var(--ui-surface-strong);
+  color: var(--ui-text);
+  box-shadow: 0 14px 34px rgba(28, 54, 71, 0.09), inset 0 1px rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
+  backdrop-filter: blur(20px) saturate(145%);
 }
 
 .collection-quick-stats__ring {
@@ -5709,8 +5698,8 @@ a:focus-visible,
   border-radius: 50%;
   background: conic-gradient(
     from -90deg,
-    currentColor 0deg var(--stat-progress),
-    rgba(35, 29, 35, 0.16) var(--stat-progress) 360deg
+    var(--ui-accent) 0deg var(--stat-progress),
+    color-mix(in srgb, var(--ui-muted) 20%, transparent) var(--stat-progress) 360deg
   );
 }
 
@@ -5719,7 +5708,7 @@ a:focus-visible,
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--ui-surface-strong);
   content: "";
 }
 
@@ -5739,7 +5728,7 @@ a:focus-visible,
 
 .collection-quick-stats__item .collection-quick-stats__label {
   overflow: hidden;
-  color: rgba(35, 29, 35, 0.76);
+  color: var(--ui-muted);
   font-size: 0.78rem;
   font-weight: 550;
   text-overflow: ellipsis;
@@ -5757,6 +5746,10 @@ a:focus-visible,
 .collection-quick-stats__latest strong {
   color: var(--ui-text);
   font-weight: 550;
+}
+
+.dark-mode .collection-quick-stats__item {
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.07);
 }
 
 /* La fascia dei marchi resta a tutta larghezza sotto il hero. */
