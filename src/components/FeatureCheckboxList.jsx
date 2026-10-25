@@ -26,19 +26,15 @@ const FeatureCheckboxList = ({
   }
 
   return (
-    <div>
-      <strong>Seleziona Caratteristiche</strong>
-      <div className="details-menu">
+    <fieldset className="watch-feature-selector">
+      <legend>Seleziona Caratteristiche</legend>
+      <div className="watch-feature-selector__options">
         {featuresList.map((feature) => {
           const isChecked = selectedFeatures.includes(feature.id_caratteristica);
           return (
-            <label 
-              key={feature.id_caratteristica} 
-              className={`checkbox-label ${isChecked ? 'selected' : ''}`}
-            >
+            <label key={feature.id_caratteristica} className={isChecked ? 'is-selected' : ''}>
               <input
                 type="checkbox"
-                className="checkbox-input"
                 value={feature.id_caratteristica}
                 checked={isChecked}
                 onChange={onChange}
@@ -48,7 +44,7 @@ const FeatureCheckboxList = ({
           );
         })}
       </div>
-    </div>
+    </fieldset>
   );
 };
 

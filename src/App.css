@@ -1794,7 +1794,8 @@ input::placeholder {
   line-height: 1.45;
 }
 
-.watch-occasion-selector {
+.watch-occasion-selector,
+.watch-feature-selector {
   display: grid;
   gap: 12px;
   min-width: 0;
@@ -1806,7 +1807,8 @@ input::placeholder {
   background: color-mix(in srgb, var(--ui-surface-strong) 75%, transparent);
 }
 
-.watch-occasion-selector legend {
+.watch-occasion-selector legend,
+.watch-feature-selector legend {
   padding: 0 6px;
   font-size: 0.85rem;
   font-weight: 700;
@@ -1826,7 +1828,16 @@ input::placeholder {
   margin-top: 4px;
 }
 
-.watch-occasion-selector__options label {
+.watch-feature-selector__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 136px), 1fr));
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.watch-occasion-selector__options label,
+.watch-feature-selector__options label {
   display: inline-flex;
   min-height: 38px;
   align-items: center;
@@ -1842,15 +1853,19 @@ input::placeholder {
 }
 
 .watch-occasion-selector__options label:hover,
-.watch-occasion-selector__options label.is-selected {
+.watch-feature-selector__options label:hover,
+.watch-occasion-selector__options label.is-selected,
+.watch-feature-selector__options label.is-selected {
   border-color: var(--ui-accent);
 }
 
-.watch-occasion-selector__options label.is-selected {
+.watch-occasion-selector__options label.is-selected,
+.watch-feature-selector__options label.is-selected {
   background: var(--ui-accent-soft);
 }
 
-.watch-occasion-selector__options input {
+.watch-occasion-selector__options input,
+.watch-feature-selector__options input {
   box-sizing: border-box;
   width: 16px;
   height: 16px;
@@ -1860,7 +1875,8 @@ input::placeholder {
   accent-color: var(--ui-accent);
 }
 
-.watch-occasion-selector__options input:focus-visible {
+.watch-occasion-selector__options input:focus-visible,
+.watch-feature-selector__options input:focus-visible {
   outline: 3px solid var(--ui-accent-soft);
   outline-offset: 2px;
 }
@@ -7994,7 +8010,12 @@ a:focus-visible,
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 136px), 1fr));
 }
 
+.modify-watch-form .watch-feature-selector__options {
+  max-height: 280px;
+}
+
 .modify-watch-form .watch-occasion-selector__options label,
+.modify-watch-form .watch-feature-selector__options label,
 .modify-watch-form .watch-equipment-check,
 .modify-watch-form .checkbox-label {
   display: flex;
@@ -8021,12 +8042,14 @@ a:focus-visible,
 }
 
 .modify-watch-form .watch-occasion-selector__options label:hover,
+.modify-watch-form .watch-feature-selector__options label:hover,
 .modify-watch-form .watch-equipment-check:hover,
 .modify-watch-form .checkbox-label:hover {
   border-color: color-mix(in srgb, var(--ui-accent) 55%, var(--ui-border));
 }
 
 .modify-watch-form .watch-occasion-selector__options label.is-selected,
+.modify-watch-form .watch-feature-selector__options label.is-selected,
 .modify-watch-form .watch-equipment-check.is-selected {
   border-color: var(--ui-accent);
   background: var(--ui-accent-soft);
@@ -8043,6 +8066,7 @@ a:focus-visible,
 }
 
 .modify-watch-form .watch-occasion-selector__options input[type="checkbox"],
+.modify-watch-form .watch-feature-selector__options input[type="checkbox"],
 .modify-watch-form .watch-equipment-check input[type="checkbox"],
 .modify-watch-form .checkbox-label .checkbox-input {
   position: static;
@@ -8068,6 +8092,7 @@ a:focus-visible,
 }
 
 .modify-watch-form .watch-occasion-selector__options input[type="checkbox"]::before,
+.modify-watch-form .watch-feature-selector__options input[type="checkbox"]::before,
 .modify-watch-form .watch-equipment-check input[type="checkbox"]::before,
 .modify-watch-form .checkbox-label .checkbox-input::before {
   width: 8px;
@@ -8081,6 +8106,7 @@ a:focus-visible,
 }
 
 .modify-watch-form .watch-occasion-selector__options input[type="checkbox"]:checked,
+.modify-watch-form .watch-feature-selector__options input[type="checkbox"]:checked,
 .modify-watch-form .watch-equipment-check input[type="checkbox"]:checked,
 .modify-watch-form .checkbox-label .checkbox-input:checked {
   border-color: var(--ui-accent);
@@ -8088,12 +8114,14 @@ a:focus-visible,
 }
 
 .dark-mode .modify-watch-form .watch-occasion-selector__options input[type="checkbox"]::before,
+.dark-mode .modify-watch-form .watch-feature-selector__options input[type="checkbox"]::before,
 .dark-mode .modify-watch-form .watch-equipment-check input[type="checkbox"]::before,
 .dark-mode .modify-watch-form .checkbox-label .checkbox-input::before {
   border-color: #18232a;
 }
 
 .modify-watch-form .watch-occasion-selector__options input[type="checkbox"]:checked::before,
+.modify-watch-form .watch-feature-selector__options input[type="checkbox"]:checked::before,
 .modify-watch-form .watch-equipment-check input[type="checkbox"]:checked::before,
 .modify-watch-form .checkbox-label .checkbox-input:checked::before {
   opacity: 1;
@@ -8325,6 +8353,8 @@ a:focus-visible,
 
 .add-watch-form .watch-occasion-selector__options,
 .modify-watch-form .watch-occasion-selector__options,
+.add-watch-form .watch-feature-selector__options,
+.modify-watch-form .watch-feature-selector__options,
 .add-watch-form .details-menu,
 .modify-watch-form .details-menu {
   display: grid;
@@ -8335,6 +8365,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options label,
+.watch-feature-selector__options label,
 .watch-equipment-fields .watch-equipment-check,
 .details-menu .checkbox-label,
 .notification-settings__option,
@@ -8364,6 +8395,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options label:hover,
+.watch-feature-selector__options label:hover,
 .watch-equipment-fields .watch-equipment-check:hover,
 .details-menu .checkbox-label:hover,
 .notification-settings__option:hover,
@@ -8372,6 +8404,7 @@ a:focus-visible,
 }
 
 .add-watch-form .watch-occasion-selector__options label:hover:not(.is-selected),
+.add-watch-form .watch-feature-selector__options label:hover:not(.is-selected),
 .add-watch-form .watch-equipment-fields .watch-equipment-check:hover:not(.is-selected),
 .add-watch-form .details-menu .checkbox-label:hover:not(.selected) {
   border-color: color-mix(in srgb, var(--ui-accent) 55%, var(--ui-border));
@@ -8380,6 +8413,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options label.is-selected,
+.watch-feature-selector__options label.is-selected,
 .watch-equipment-fields .watch-equipment-check.is-selected,
 .notification-settings__option:has(input[type="checkbox"]:checked),
 .collection-favorites-filter:has(input[type="checkbox"]:checked) {
@@ -8415,6 +8449,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options input[type="checkbox"],
+.watch-feature-selector__options input[type="checkbox"],
 .watch-equipment-fields .watch-equipment-check input[type="checkbox"],
 .details-menu .checkbox-label .checkbox-input,
 .notification-settings__option input[type="checkbox"],
@@ -8442,6 +8477,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options input[type="checkbox"]::before,
+.watch-feature-selector__options input[type="checkbox"]::before,
 .watch-equipment-fields .watch-equipment-check input[type="checkbox"]::before,
 .details-menu .checkbox-label .checkbox-input::before,
 .notification-settings__option input[type="checkbox"]::before,
@@ -8457,6 +8493,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options input[type="checkbox"]:checked,
+.watch-feature-selector__options input[type="checkbox"]:checked,
 .watch-equipment-fields .watch-equipment-check input[type="checkbox"]:checked,
 .details-menu .checkbox-label .checkbox-input:checked,
 .notification-settings__option input[type="checkbox"]:checked,
@@ -8466,6 +8503,7 @@ a:focus-visible,
 }
 
 .dark-mode .watch-occasion-selector__options input[type="checkbox"]::before,
+.dark-mode .watch-feature-selector__options input[type="checkbox"]::before,
 .dark-mode .watch-equipment-fields .watch-equipment-check input[type="checkbox"]::before,
 .dark-mode .details-menu .checkbox-label .checkbox-input::before,
 .dark-mode .notification-settings__option input[type="checkbox"]::before,
@@ -8474,6 +8512,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options input[type="checkbox"]:checked::before,
+.watch-feature-selector__options input[type="checkbox"]:checked::before,
 .watch-equipment-fields .watch-equipment-check input[type="checkbox"]:checked::before,
 .details-menu .checkbox-label .checkbox-input:checked::before,
 .notification-settings__option input[type="checkbox"]:checked::before,
@@ -8483,6 +8522,7 @@ a:focus-visible,
 }
 
 .watch-occasion-selector__options input[type="checkbox"]:focus-visible,
+.watch-feature-selector__options input[type="checkbox"]:focus-visible,
 .watch-equipment-fields .watch-equipment-check input[type="checkbox"]:focus-visible,
 .details-menu .checkbox-label .checkbox-input:focus-visible,
 .notification-settings__option input[type="checkbox"]:focus-visible,
