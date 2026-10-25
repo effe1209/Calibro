@@ -364,9 +364,6 @@ function App() {
     testConnection();
     fetchUser();
 
-    const savedEmail = localStorage.getItem('email');
-    if (savedEmail) setEmail(savedEmail);
-
     const savedNickname = localStorage.getItem('nickname');
     if (savedNickname) setNickname(savedNickname);
   }, []);
@@ -422,13 +419,18 @@ function App() {
         setMessage("Email e password sono obbligatori.");
         return;
       }
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username: nickname.trim() } },
+      });
       if (error) throw error;
-      const userId = data.user.id;
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert([{ id: userId, username: nickname }]);
-      if (profileError) throw profileError;
+      if (data.session && data.user) {
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .upsert({ id: data.user.id, username: nickname.trim() }, { onConflict: 'id' });
+        if (profileError) throw profileError;
+      }
 
       setMessage("Registrazione avvenuta con successo! Controlla la tua email per confermare l'account.");
     } catch (error) {
@@ -444,7 +446,6 @@ function App() {
 
   const handleLogin = async () => {
     setLoading(true);
-    localStorage.setItem('email', email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -458,16 +459,26 @@ function App() {
 
       if (data.user) {
         setUser(data.user);
+        setPassword('');
         const { data: userProfile, error: profileError } = await supabase
           .from('user_profiles')
           .select('username')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
           
         if (profileError) {
           console.error("Errore nel recupero del nome utente:", profileError);
-        } else if (userProfile) {
-          setNickname(userProfile.username);
+        } else {
+          const username = userProfile?.username || data.user.user_metadata?.username || '';
+          setNickname(username);
+          if (!userProfile && username) {
+            const { error: profileInsertError } = await supabase
+              .from('user_profiles')
+              .upsert({ id: data.user.id, username }, { onConflict: 'id' });
+            if (profileInsertError) {
+              console.error("Errore nel salvataggio del nome utente:", profileInsertError);
+            }
+          }
         }
         
         setMessage("Accesso effettuato con successo!");
@@ -489,6 +500,7 @@ function App() {
       setUser(null);
       setWatches([]);
       setEmail('');
+      setPassword('');
       setNickname('');
       let storageWarning = false;
       try {

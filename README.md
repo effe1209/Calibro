@@ -35,7 +35,7 @@ Il backup completo è un file JSON autonomo con le immagini incluse. Il ripristi
 
 Le foto degli orologi sono conservate nel bucket privato `watch-photos-private`; gli sfondi pubblici continuano a usare `fotoWatch`. Per attivare le transazioni di salvataggio e il bucket privato:
 
-1. Applica `supabase/migrations/20261025_atomic_private_watch_images.sql` al progetto Supabase.
+1. Applica le migration SQL in `supabase/migrations/` in ordine cronologico, inclusa `20261025_security_hardening.sql`.
 2. Distribuisci la nuova versione dell’app.
 3. Migra le foto già esistenti dal bucket pubblico impostando `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nell’ambiente e avviando `node scripts/migrate-watch-photos.mjs`.
 
