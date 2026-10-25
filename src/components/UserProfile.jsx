@@ -3,8 +3,11 @@ import Avatar from 'react-avatar';
 import GlassSurface from './GlassSurface';
 import { BiFontFamily } from 'react-icons/bi';
 
-function UserProfile({ email, isDark}) {
-  const name = email ? email.split('@')[0] : '...';
+function UserProfile({ email, nickname, isDark }) {
+  const displayName = nickname?.trim() || email?.split('@')[0]?.trim() || 'Utente';
+  const initial = Array.from(displayName.match(/[A-Za-z0-9À-ÖØ-öø-ÿ]/u)?.[0] || 'U')
+    .join('')
+    .toLocaleUpperCase('it');
   
   return (
     <GlassSurface 
@@ -27,7 +30,7 @@ function UserProfile({ email, isDark}) {
       }}
     >
       <Avatar 
-        name={name} 
+        name={initial}
         size="70" 
         /* 4. L'Avatar deve seguire la stessa stondatura del vetro */
         round="20px" 

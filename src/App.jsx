@@ -291,6 +291,7 @@ function App() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
+        setEmail(session.user.email || '');
         fetchWatches(session.user.id); 
       }
     };
@@ -392,6 +393,7 @@ function App() {
 
       if (data.user) {
         setUser(data.user);
+        setEmail(data.user.email || '');
         setPassword('');
         const { data: userProfile, error: profileError } = await supabase
           .from('user_profiles')
@@ -1557,7 +1559,7 @@ const BackgroundLayer = useMemo(() => {
             <div className="profile-info-content relative z-10">
               <div className="circular-text-container">
                 <div className="profile-picture">
-                  <UserProfile email={email} isDark={isDark} />
+                  <UserProfile email={email} nickname={nickname} isDark={isDark} />
                 </div>
               </div>
               <h4 className="Saluti">Benvenuto, {nickname}</h4>
