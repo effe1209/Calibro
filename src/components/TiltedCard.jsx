@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'motion/react';
+import { useWatchThumbnail } from './useWatchThumbnail';
 import './componentCSS/TiltedCard.css';
 
 const springValues = {
@@ -10,6 +11,7 @@ const springValues = {
 
 export default function TiltedCard({
   imageSrc,
+  imageValue,
   altText = 'Tilted card image',
   captionText = '',
   containerHeight = '300px',
@@ -26,6 +28,7 @@ export default function TiltedCard({
   displayOverlayContent = false
 }) {
   const ref = useRef(null);
+  const thumbnail = useWatchThumbnail(imageValue, imageSrc, ref);
 
   const x = useMotionValue();
   const y = useMotionValue();
@@ -102,11 +105,17 @@ export default function TiltedCard({
         }}
       >
         <motion.img
-          src={imageSrc}
+          src={imageValue ? thumbnail.imageSrc : imageSrc}
           alt={altText}
           className="tilted-card-img"
           loading={loading}
-          onError={onError}
+          onError={(event) => {
+            if (imageValue) {
+              thumbnail.handleImageError(event, onError);
+            } else {
+              onError?.(event);
+            }
+          }}
           style={{
             width: imageWidth,
             height: imageHeight

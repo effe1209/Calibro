@@ -4,6 +4,12 @@ import { supabase } from './supabaseClient';
 export const PRIVATE_WATCH_PHOTO_BUCKET = 'watch-photos-private';
 const LEGACY_WATCH_PHOTO_BUCKET = 'fotoWatch';
 const SIGNED_URL_LIFETIME_SECONDS = 60 * 60 * 24;
+const WATCH_THUMBNAIL_TRANSFORM = {
+  width: 480,
+  height: 480,
+  resize: 'contain',
+  quality: 72,
+};
 
 const getStorageObject = (value) => {
   const image = String(value || '').trim();
@@ -93,6 +99,31 @@ export const getWatchImageUrls = async (imageValues) => {
 export const getWatchImageUrl = async (imageValue) => {
   const [imageUrl] = await getWatchImageUrls([imageValue]);
   return imageUrl;
+};
+
+export const getWatchThumbnailUrl = async (imageValue) => {
+  const storageObject = getStorageObject(imageValue);
+  if (!storageObject) return null;
+  if (storageObject.url) return storageObject.url;
+
+  if (storageObject.bucket === PRIVATE_WATCH_PHOTO_BUCKET) {
+    if (/\.svg$/i.test(storageObject.path)) {
+      return getWatchImageUrl(imageValue);
+    }
+
+    const { data, error } = await supabase.storage
+      .from(PRIVATE_WATCH_PHOTO_BUCKET)
+      .createSignedUrl(storageObject.path, SIGNED_URL_LIFETIME_SECONDS, {
+        transform: WATCH_THUMBNAIL_TRANSFORM,
+      });
+    if (error) throw error;
+    return data.signedUrl;
+  }
+
+  return supabase.storage
+    .from(LEGACY_WATCH_PHOTO_BUCKET)
+    .getPublicUrl(storageObject.path, { transform: WATCH_THUMBNAIL_TRANSFORM })
+    .data.publicUrl;
 };
 
 export const removeWatchImage = async (imageValue) => {

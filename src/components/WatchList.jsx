@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Navigation, Pagination, A11y } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { motion } from 'framer-motion';
 import FavoriteButton from './FavoriteButton';
 import TiltedCard from './TiltedCard';
+import { useWatchThumbnail } from './useWatchThumbnail';
 import MaintenanceReminderBanner from './MaintenanceReminderBanner';
 
 // Importa gli stili di Swiper necessari
@@ -36,6 +37,22 @@ const csvCell = (value) => {
   }
   if (/[=+\-@]/.test(text[firstNonWhitespace] || '')) text = `'${text}`;
   return `"${text.replace(/"/g, '""')}"`;
+};
+
+const WatchCarouselImage = ({ watch }) => {
+  const imageRef = useRef(null);
+  const thumbnail = useWatchThumbnail(watch.image, watch.imageUrl, imageRef);
+
+  return (
+    <img
+      ref={imageRef}
+      src={thumbnail.imageSrc}
+      alt={watch.name}
+      className="watch-imageCarosel"
+      loading="lazy"
+      onError={(event) => thumbnail.handleImageError(event)}
+    />
+  );
 };
 
 // Questo componente gestisce la visualizzazione (lista o carosello)
@@ -416,6 +433,7 @@ const WatchList = ({
                 {watch.imageUrl ? (
                   <TiltedCard
                     imageSrc={watch.imageUrl} // Usa imageUrl
+                    imageValue={watch.image}
                     altText={watch.name}
                     containerHeight="260px"
                     containerWidth="100%"
@@ -495,13 +513,10 @@ const WatchList = ({
                     onToggle={() => handleFavoriteToggle(watch.id)}
                   />
                   <div className="carousel-card__image">
-                    <img
-                      src={watch.imageUrl || 'orologio_back.svg'}
-                      alt={watch.name}
-                      className="watch-imageCarosel"
-                      loading="lazy"
-                      onError={(e) => { e.currentTarget.src = 'orologio_back.svg'; }}
-                    />
+                    {watch.imageUrl && <WatchCarouselImage watch={watch} />}
+                    {!watch.imageUrl && (
+                      <img src="orologio_back.svg" alt={watch.name} className="watch-imageCarosel" />
+                    )}
                   </div>
                   <div className="watchName_Button">
                     <h3 className="textCard">{watch.name}</h3>
