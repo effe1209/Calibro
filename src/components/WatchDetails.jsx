@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WatchDetails = ({ watch }) => {
+const WatchDetails = ({ watch, imageLoading = 'lazy', onImageError }) => {
   const features = Array.isArray(watch.caratteristiche)
     ? watch.caratteristiche.filter(Boolean)
     : [];
@@ -26,8 +26,11 @@ const WatchDetails = ({ watch }) => {
           src={watch.imageUrl || 'orologio_back.svg'}
           alt={watch.name || 'Orologio della collezione'}
           className="watch-detail-image"
-          loading="lazy"
-          onError={(event) => { event.currentTarget.src = 'orologio_back.svg'; }}
+          loading={imageLoading}
+          onError={(event) => {
+            onImageError?.(event);
+            event.currentTarget.src = 'orologio_back.svg';
+          }}
         />
       </div>
 

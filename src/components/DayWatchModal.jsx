@@ -1,8 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import WatchDetails from './WatchDetails';
+import { getWatchImageUrl } from './imageService';
 
 // Modale semplice per l'"Orologio del Giorno"
 const DayWatchModal = ({ isVisible, setIsVisible, selectedWatch, modalTitle }) => {
+  const [imageState, setImageState] = useState({
+    watchId: null,
+    imageUrl: null,
+    isLoading: false,
+    error: null,
+  });
 
   useEffect(() => {
     if (isVisible) document.body.style.overflow = 'hidden';
@@ -11,9 +18,59 @@ const DayWatchModal = ({ isVisible, setIsVisible, selectedWatch, modalTitle }) =
     return () => { document.body.style.overflow = 'unset'; };
   }, [isVisible]);
 
+  useEffect(() => {
+    if (!isVisible || !selectedWatch) return undefined;
+
+    let isCurrent = true;
+    const imageValue = selectedWatch.image || selectedWatch.imageUrl;
+    setImageState({
+      watchId: selectedWatch.id,
+      imageUrl: null,
+      isLoading: Boolean(imageValue),
+      error: null,
+    });
+
+    if (imageValue) {
+      getWatchImageUrl(imageValue)
+        .then((imageUrl) => {
+          if (isCurrent) {
+            setImageState({
+              watchId: selectedWatch.id,
+              imageUrl,
+              isLoading: false,
+              error: null,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Impossibile caricare la foto dell’orologio del giorno:', error);
+          if (isCurrent) {
+            setImageState({
+              watchId: selectedWatch.id,
+              imageUrl: null,
+              isLoading: false,
+              error: 'La foto di questo orologio non è al momento disponibile.',
+            });
+          }
+        });
+    }
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isVisible, selectedWatch]);
+
   if (!isVisible || !selectedWatch) {
     return null;
   }
+
+  const currentImageState = imageState.watchId === selectedWatch.id
+    ? imageState
+    : { imageUrl: null, isLoading: Boolean(selectedWatch.image || selectedWatch.imageUrl), error: null };
+  const watchForDisplay = {
+    ...selectedWatch,
+    imageUrl: currentImageState.imageUrl,
+  };
 
   return (
     <div className="modal-overlay" onClick={() => setIsVisible(false)}>
@@ -27,7 +84,22 @@ const DayWatchModal = ({ isVisible, setIsVisible, selectedWatch, modalTitle }) =
             </div>
           </header>
 
-          <WatchDetails watch={selectedWatch} />
+          {currentImageState.isLoading && (
+            <p role="status">Caricamento della foto…</p>
+          )}
+          {currentImageState.error && (
+            <p role="status">{currentImageState.error}</p>
+          )}
+          <WatchDetails
+            watch={watchForDisplay}
+            imageLoading="eager"
+            onImageError={() => {
+              setImageState((current) => ({
+                ...current,
+                error: 'La foto non è riuscita a caricarsi. Riprova tra poco.',
+              }));
+            }}
+          />
 
           <footer className="watch-detail-footer">
             <button type="button" className="funzioniButton" onClick={() => setIsVisible(false)}>Chiudi</button>
@@ -39,4 +111,3 @@ const DayWatchModal = ({ isVisible, setIsVisible, selectedWatch, modalTitle }) =
 };
 
 export default DayWatchModal;
-
