@@ -31,6 +31,18 @@ Calibro è un'applicazione web moderna e responsiva progettata per gli appassion
 
 Il backup completo è un file JSON autonomo con le immagini incluse. Il ripristino unisce i dati: aggiorna i record con lo stesso identificativo di backup e lascia inalterati gli altri.
 
+### Storage privato delle foto
+
+Le foto degli orologi sono conservate nel bucket privato `watch-photos-private`; gli sfondi pubblici continuano a usare `fotoWatch`. Per attivare le transazioni di salvataggio e il bucket privato:
+
+1. Applica `supabase/migrations/20261025_atomic_private_watch_images.sql` al progetto Supabase.
+2. Distribuisci la nuova versione dell’app.
+3. Migra le foto già esistenti dal bucket pubblico impostando `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nell’ambiente e avviando `node scripts/migrate-watch-photos.mjs`.
+
+La chiave `SUPABASE_SERVICE_ROLE_KEY` è privilegiata: usala solo in un ambiente amministrativo sicuro e non inserirla nel repository o nelle variabili `VITE_*`. Lo script sposta le foto associate alle schede orologio, aggiorna i riferimenti, trasferisce in privato anche gli altri file nelle cartelle utente e rimuove le copie pubbliche; lascia intatti gli sfondi nella cartella principale. Le immagini esterne o le copie pubbliche non rimosse vengono segnalate e richiedono verifica manuale.
+
+Per gli abbinamenti outfit e per preparare le foto degli orologi agli abbinamenti, le immagini vengono inviate via HTTPS al servizio AI ospitato su Hugging Face; l’interfaccia lo segnala nei punti di caricamento.
+
 ## 🧠 Funzioni Intelligenti e Interattive
 - Valore della collezione: Confronto tra spesa d’acquisto e valore dichiarato, con andamento degli acquisti per anno.
 - Orologio del Giorno: Selezione casuale di un orologio dalla collezione per suggerire cosa indossare.

@@ -4,6 +4,11 @@ import {
   REMINDER_DAY_OPTIONS,
   normalizeNotificationPreferences,
 } from './notificationPreferences';
+import {
+  getWatchImageUrl,
+  removeWatchImage,
+  uploadWatchImageBlob,
+} from './imageService';
 
 const BACKUP_FORMAT = 'calibro-collection-backup';
 const BACKUP_VERSION = 3;
@@ -40,11 +45,6 @@ const imageToBlob = (dataUrl) => {
   const bytes = new Uint8Array(binary.length);
   for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
   return new Blob([bytes], { type: match[1] || 'application/octet-stream' });
-};
-
-const imageExtension = (mimeType) => {
-  const subtype = String(mimeType || '').split('/')[1]?.split('+')[0]?.toLowerCase();
-  return ({ jpeg: 'jpg', 'svg+xml': 'svg', 'x-icon': 'ico' })[subtype] || subtype || 'img';
 };
 
 const toPlainObject = (record, keys) => Object.fromEntries(
@@ -92,7 +92,7 @@ export const createFullBackup = async (userId) => {
     const features = featureEntries
       .map((entry) => entry?.caratteristiche?.nome_caratteristica)
       .filter(Boolean);
-    const imageUrl = watch.image || null;
+    const imageUrl = watch.image ? await getWatchImageUrl(watch.image) : null;
     return {
       backup_uid: watch.backup_uid,
       fields: toPlainObject(watch, WATCH_FIELDS),
@@ -261,121 +261,79 @@ export const restoreFullBackup = async (backup, userId) => {
     throw new Error(`Caratteristiche assenti in questa installazione: ${missingFeatures.join(', ')}.`);
   }
 
-  const rowsToUpsert = [];
-  for (const watch of backup.watches) {
-    let imageUrl = null;
-    if (watch.image?.dataUrl) {
-      const imageBlob = imageToBlob(watch.image.dataUrl);
-      const path = `${userId}/backup-${watch.backup_uid}.${imageExtension(imageBlob.type)}`;
-      const { error: uploadError } = await supabase.storage
-        .from('fotoWatch')
-        .upload(path, imageBlob, { upsert: true, contentType: imageBlob.type || undefined });
-      if (uploadError) throw uploadError;
-      const { data: publicUrlData } = supabase.storage.from('fotoWatch').getPublicUrl(path);
-      imageUrl = publicUrlData.publicUrl;
-    }
-    const watchFields = toPlainObject(watch.fields, WATCH_FIELDS);
-    if (backup.version < 3) {
-      watchFields.purchase_date = null;
-      watchFields.declared_value = watchFields.money;
-    }
-    rowsToUpsert.push({
-      ...watchFields,
-      occasions: Array.isArray(watch.fields.occasions) ? watch.fields.occasions : [],
-      userid: userId,
-      backup_uid: watch.backup_uid,
-      image: imageUrl,
-    });
-  }
-
-  let restoredWatches = [];
-  if (rowsToUpsert.length) {
+  const backupUids = backup.watches.map((watch) => watch.backup_uid);
+  let previousImages = [];
+  if (backupUids.length > 0) {
     const { data, error } = await supabase
       .from('watches')
-      .upsert(rowsToUpsert, { onConflict: 'userid,backup_uid' })
-      .select('id, backup_uid');
+      .select('backup_uid, image')
+      .eq('userid', userId)
+      .in('backup_uid', backupUids);
     if (error) throw error;
-    restoredWatches = data || [];
+    previousImages = data || [];
   }
-  const watchIdByBackupUid = new Map(restoredWatches.map((watch) => [watch.backup_uid, watch.id]));
 
-  if (restoredWatches.length) {
-    const restoredIds = restoredWatches.map((watch) => watch.id);
-    const { data: existingRelations, error: relationsError } = await supabase
-      .from('Orologi_Caratteristiche')
-      .select('id_watch, id_caratteristica')
-      .in('id_watch', restoredIds);
-    if (relationsError) throw relationsError;
+  const uploadedImages = [];
+  const watchesForRestore = [];
+  try {
+    for (const watch of backup.watches) {
+      let imagePath = null;
+      if (watch.image?.dataUrl) {
+        imagePath = await uploadWatchImageBlob(imageToBlob(watch.image.dataUrl), userId);
+        uploadedImages.push(imagePath);
+      }
 
-    const relationKeys = new Set((existingRelations || []).map((entry) => `${entry.id_watch}:${entry.id_caratteristica}`));
-
-    const featureRelations = backup.watches.flatMap((watch) => {
-      const watchId = watchIdByBackupUid.get(watch.backup_uid);
-      return watch.features.flatMap((name) => {
-        const featureId = featureByName.get(name.trim().toLocaleLowerCase('it'));
-        const relationKey = `${watchId}:${featureId}`;
-        if (relationKeys.has(relationKey)) return [];
-        relationKeys.add(relationKey);
-        return [{ id_watch: watchId, id_caratteristica: featureId }];
+      const watchFields = toPlainObject(watch.fields, WATCH_FIELDS);
+      if (backup.version < 3) {
+        watchFields.purchase_date = null;
+        watchFields.declared_value = watchFields.money;
+      }
+      watchesForRestore.push({
+        backup_uid: watch.backup_uid,
+        fields: {
+          ...watchFields,
+          occasions: Array.isArray(watch.fields.occasions) ? watch.fields.occasions : [],
+        },
+        image: imagePath,
+        feature_ids: watch.features.map((name) => featureByName.get(name.trim().toLocaleLowerCase('it'))),
       });
-    });
-    if (featureRelations.length) {
-      const { error } = await supabase.from('Orologi_Caratteristiche').insert(featureRelations);
-      if (error) throw error;
     }
-  }
 
-  const maintenanceRows = backup.maintenance.map((entry) => {
-    const watchId = watchIdByBackupUid.get(entry.watch_backup_uid);
-    if (!watchId) throw new Error('Non è stato possibile collegare una revisione al relativo orologio.');
-    return {
-      ...toPlainObject(entry.fields, MAINTENANCE_FIELDS),
-      user_id: userId,
-      watch_id: watchId,
-      backup_uid: entry.backup_uid,
-    };
-  });
-  if (maintenanceRows.length) {
-    const { error } = await supabase
-      .from('watch_maintenance')
-      .upsert(maintenanceRows, { onConflict: 'user_id,backup_uid' });
-    if (error) throw error;
-  }
+    const { data: counts, error: restoreError } = await supabase.rpc('restore_watch_collection', {
+      p_watches: watchesForRestore,
+      p_maintenance: backup.maintenance,
+      p_outfit_feedback: backup.outfit_feedback || [],
+      p_notification_preferences: backup.notification_preferences
+        ? normalizeNotificationPreferences(backup.notification_preferences)
+        : null,
+    });
+    if (restoreError) throw restoreError;
 
-  const outfitFeedbackRows = (backup.outfit_feedback || []).map((entry) => {
-    const watchId = watchIdByBackupUid.get(entry.watch_backup_uid);
-    if (!watchId) throw new Error('Non è stato possibile collegare una preferenza outfit al relativo orologio.');
-    return {
-      user_id: userId,
-      watch_id: watchId,
-      occasion: entry.occasion,
-      color_family: entry.color_family,
-      feedback: entry.feedback,
-      updated_at: new Date().toISOString(),
-    };
-  });
-  if (outfitFeedbackRows.length) {
-    const { error } = await supabase
-      .from('watch_outfit_feedback')
-      .upsert(outfitFeedbackRows, { onConflict: 'user_id,watch_id,occasion,color_family' });
-    if (error) throw error;
+    let cleanupWarnings = 0;
+    const newImageByUid = new Map(watchesForRestore.map((watch) => [watch.backup_uid, watch.image]));
+    for (const oldImage of previousImages) {
+      if (!oldImage.image || oldImage.image === newImageByUid.get(oldImage.backup_uid)) continue;
+      try {
+        await removeWatchImage(oldImage.image);
+      } catch (cleanupError) {
+        cleanupWarnings += 1;
+        console.error('Ripristino completato, ma una vecchia foto non è stata rimossa:', cleanupError);
+      }
+    }
+    return { ...counts, cleanupWarnings };
+  } catch (error) {
+    const cleanupErrors = [];
+    for (const imagePath of uploadedImages) {
+      try {
+        await removeWatchImage(imagePath);
+      } catch (cleanupError) {
+        cleanupErrors.push(cleanupError);
+        console.error('Impossibile rimuovere una foto temporanea dopo il rollback del ripristino:', cleanupError);
+      }
+    }
+    if (cleanupErrors.length) {
+      throw new Error(`${error.message} ${cleanupErrors.length} foto temporanee non sono state rimosse automaticamente.`);
+    }
+    throw error;
   }
-
-  if (backup.notification_preferences) {
-    const { error } = await supabase
-      .from('watch_notification_preferences')
-      .upsert({
-        user_id: userId,
-        ...normalizeNotificationPreferences(backup.notification_preferences),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
-    if (error) throw error;
-  }
-
-  return {
-    watches: rowsToUpsert.length,
-    maintenance: maintenanceRows.length,
-    outfitFeedback: outfitFeedbackRows.length,
-    notificationPreferences: Boolean(backup.notification_preferences),
-  };
 };

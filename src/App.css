@@ -6203,6 +6203,18 @@ a:focus-visible,
   margin: 0;
 }
 
+.external-image-processing-notice {
+  margin: 8px 0 0;
+  color: var(--ui-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+#function-section .function-card__copy .external-image-processing-notice {
+  margin-top: 8px;
+  font-size: 0.75rem;
+}
+
 .add-watch-form .add-watch-preview {
   display: block;
   max-width: min(100%, 300px);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { OUTFIT_COLOR_FAMILIES, OUTFIT_OCCASIONS } from './outfitPreferences';
+import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
 
 // Raggruppa i bottoni delle "Funzioni"
 const FunctionsSection = ({
@@ -38,6 +39,7 @@ const FunctionsSection = ({
           <span className="function-card__eyebrow">ABBINAMENTO PERSONALE</span>
           <h4>Completa l'outfit</h4>
           <p>Carica una foto nitida dell’outfit: cercherò gli abbinamenti nella tua collezione.</p>
+          <ExternalImageProcessingNotice />
         </div>
 
         <div className="outfit-preferences">
@@ -104,4 +106,3 @@ const FunctionsSection = ({
 };
 
 export default FunctionsSection;
-

@@ -4,6 +4,11 @@ import imageCompression from 'browser-image-compression';
 // Import Supabase e servizi (invariati)
 import { supabase } from './components/supabaseClient';
 import { addWatchService } from './components/watchService';
+import {
+  getWatchImageUrl,
+  removeWatchImage,
+  uploadWatchImage,
+} from './components/imageService';
 import { downloadFullBackup, parseBackupFile, restoreFullBackup } from './components/backupService';
 import AuthForm from './components/AuthForm';
 import WatchAnalytics from './components/WatchAnalytics'; 
@@ -478,14 +483,28 @@ function App() {
   }; 
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setWatches([]);
-    setMessage("Disconnessione effettuata.");
-    localStorage.removeItem('email');
-    localStorage.removeItem('nickname');
-    setEmail('');
-    setNickname('');
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+      setUser(null);
+      setWatches([]);
+      setEmail('');
+      setNickname('');
+      let storageWarning = false;
+      try {
+        localStorage.removeItem('email');
+        localStorage.removeItem('nickname');
+      } catch (storageError) {
+        storageWarning = true;
+        console.error('Sessione chiusa, ma non è stato possibile cancellare i dati locali:', storageError);
+      }
+      setMessage(storageWarning
+        ? 'Disconnessione effettuata, ma non è stato possibile cancellare i dati salvati nel browser.'
+        : 'Disconnessione effettuata su questo dispositivo.');
+    } catch (error) {
+      console.error('Errore durante la disconnessione:', error);
+      setMessage(`Disconnessione non riuscita: ${error.message || 'riprova.'}`);
+    }
   };
 
 const handleAddWatch = async () => {
@@ -496,6 +515,7 @@ const handleAddWatch = async () => {
     setWatches,
     setNewWatch,
     setMessage, 
+    allFeaturesList,
   };
 
   try {
@@ -536,51 +556,16 @@ const handleAddWatch = async () => {
   const uploadImage = async (file) => {
     if (!file) return null;
 
-    console.log(`Original size: ${file.size / 1024 / 1024} MB`);
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    };
-
     try {
-      const compressedFile = await imageCompression(file, options);
-      console.log(`Compressed size: ${compressedFile.size / 1024 / 1024} MB`);
-
-      const fileName = `${user.id}/${Date.now()}-${compressedFile.name}`;
-      const { data, error } = await supabase.storage
-        .from("fotoWatch")
-        .upload(fileName, compressedFile);
-
-      if (error) throw error;
-      return data.path; 
-
+      return await uploadWatchImage(file, { maxWidthOrHeight: 1920 });
     } catch (error) {
       console.error("Errore durante la compressione o l'upload:", error);
       setMessage("Errore durante il caricamento dell'immagine: " + error.message);
-      return null;
+      throw error;
     }
   };
 
-  const deleteImage = async (imagePath) => {
-    if (!imagePath) return;
-    let filePath = imagePath;
-    const bucketMarker = '/storage/v1/object/public/fotoWatch/';
-    const markerIndex = String(imagePath).indexOf(bucketMarker);
-    if (markerIndex >= 0) {
-        filePath = String(imagePath).slice(markerIndex + bucketMarker.length).split(/[?#]/)[0];
-    } else if (/^https?:\/\//i.test(String(imagePath))) {
-        return;
-    } else {
-        filePath = String(imagePath).replace(/^\/?fotoWatch\//, '').split(/[?#]/)[0];
-    }
-    const { error } = await supabase.storage
-      .from("fotoWatch")
-      .remove([filePath]);
-    if (error) {
-      console.error("Errore nell'eliminazione dell'immagine:", error.message);
-    }
-  };
+  const deleteImage = async (imagePath) => removeWatchImage(imagePath);
 
   const handleDeleteWatch = async (id, imagePath) => {
     const isConfirmed = window.confirm("Sei sicuro di voler eliminare questo orologio?");
@@ -588,38 +573,25 @@ const handleAddWatch = async () => {
     try {
       const { error } = await supabase.from("watches").delete().eq("id", id);
       if (error) throw error;
-      if (imagePath) await deleteImage(imagePath);
       setWatches(prevWatches => prevWatches.filter(watch => watch.id !== id));
-      setMessage("Orologio eliminato con successo!");
+      let cleanupWarning = false;
+      if (imagePath) {
+        try {
+          await deleteImage(imagePath);
+        } catch (imageError) {
+          cleanupWarning = true;
+          console.error("Orologio eliminato, ma la foto non è stata rimossa:", imageError);
+        }
+      }
+      setMessage(cleanupWarning
+        ? "Orologio eliminato, ma non è stato possibile rimuovere la foto dal deposito."
+        : "Orologio eliminato con successo!");
       return true;
     } catch (error) {
       setMessage("Errore durante l'eliminazione: " + error.message);
       return false;
     }
   };
-
-const getPublicUrl = (path) => {
-  if (!path) return null;
-  try {
-    const { data } = supabase.storage.from("fotoWatch").getPublicUrl(path);
-    return data.publicUrl;
-  } catch (error) {
-    console.error("Errore nel generare l'URL pubblico:", error);
-    return null;
-  }
-};
-
-const getImageUrl = (imageValue) => {
-  if (!imageValue) return null;
-  const image = String(imageValue).trim();
-  if (/^(https?:|blob:|data:)/i.test(image)) return image;
-  const bucketMarker = '/storage/v1/object/public/fotoWatch/';
-  const markerIndex = image.indexOf(bucketMarker);
-  const bucketRelativePath = markerIndex >= 0
-    ? image.slice(markerIndex + bucketMarker.length).split(/[?#]/)[0]
-    : image.replace(/^\/+/, '').replace(/^fotoWatch\//, '');
-  return getPublicUrl(bucketRelativePath);
-};
 
 const fetchWatches = async (userid) => {
   try {
@@ -628,12 +600,16 @@ const fetchWatches = async (userid) => {
       .select("*, Orologi_Caratteristiche(*, caratteristiche(*))") 
       .eq("userid", userid);
     if (error) throw error;
-    const userWatches = data.map((watch) => {
+    const userWatches = await Promise.all(data.map(async (watch) => {
       const features = (watch.Orologi_Caratteristiche || [])
         .map((joinEntry) => joinEntry?.caratteristiche)
         .filter(Boolean);
-      return { ...watch, caratteristiche: features, imageUrl: getImageUrl(watch.image) };
-    });
+      return {
+        ...watch,
+        caratteristiche: features,
+        imageUrl: await getWatchImageUrl(watch.image),
+      };
+    }));
     setWatches(userWatches);
     return true;
   } catch (error) {
@@ -677,10 +653,13 @@ const fetchWatches = async (userid) => {
       const counts = await restoreFullBackup(backup, user.id);
       const refreshed = await fetchWatches(user.id);
       if (!refreshed) throw new Error('Dati ripristinati, ma la lista non si è aggiornata. Ricarica la pagina.');
-      setMessage(`Ripristino completato: ${counts.watches} orologi, ${counts.maintenance} revisioni, ${counts.outfitFeedback} preferenze outfit${counts.notificationPreferences ? ' e preferenze notifiche' : ''} uniti alla collezione.`);
+      setMessage(
+        `Ripristino completato: ${counts.watches} orologi, ${counts.maintenance} revisioni, ${counts.outfitFeedback} preferenze outfit${counts.notificationPreferences ? ' e preferenze notifiche' : ''} uniti alla collezione.`
+        + (counts.cleanupWarnings ? ` Non è stato possibile rimuovere ${counts.cleanupWarnings} vecchie foto dal deposito.` : '')
+      );
     } catch (error) {
       console.error('Errore durante il ripristino del backup:', error);
-      setMessage(`Ripristino non riuscito: ${error.message} Se il salvataggio era già iniziato, puoi importare di nuovo lo stesso file: i record riconosciuti verranno aggiornati senza duplicarli.`);
+      setMessage(`Ripristino non riuscito: ${error.message} Le modifiche al database sono transazionali; se non sai se l’operazione è stata completata, importare di nuovo lo stesso backup è sicuro.`);
     } finally {
       event.target.value = '';
       setIsBackupBusy(false);
@@ -740,10 +719,18 @@ const fetchWatches = async (userid) => {
     }, { purchaseSpend: 0, declaredValue: 0 });
   }, [watches]);
 
-  const handleModifyWatch = (watchToModify) => {
+  const handleModifyWatch = async (watchToModify) => {
     const featureIDs = (watchToModify.caratteristiche || []).map(
       (feature) => feature.id_caratteristica
     );
+    let imageUrl = null;
+    try {
+      imageUrl = await getWatchImageUrl(watchToModify.image || watchToModify.imageUrl);
+    } catch (error) {
+      console.error('Impossibile aprire la foto dell’orologio:', error);
+      setMessage(`Impossibile caricare la foto: ${error.message}`);
+    }
+
     const nextUpdatedWatch = {
       name: watchToModify.name,
       brand: watchToModify.brand,
@@ -753,7 +740,7 @@ const fetchWatches = async (userid) => {
       color: watchToModify.color || '',
       occasions: Array.isArray(watchToModify.occasions) ? watchToModify.occasions : [],
       image: watchToModify.image || watchToModify.imageUrl || '',
-      imageUrl: getImageUrl(watchToModify.image || watchToModify.imageUrl),
+      imageUrl,
       isFavorite: watchToModify.isFavorite,
       money: watchToModify.money ?? null,
       purchase_date: watchToModify.purchase_date || null,
@@ -793,12 +780,13 @@ const fetchWatches = async (userid) => {
   const handleSaveChanges = async (updatedWatch) => {
     setLoading(true);
     let outfitEmbeddingWarning = false;
+    let uploadedImagePath = null;
+    let updateCommitted = false;
     try {
-      const { features, image, ...watchData } = updatedWatch;
+      const { features: selectedFeatures = [], image, ...watchData } = updatedWatch;
       delete watchData.imageUrl;
       const finalWatchData = { ...watchData };
       const oldImagePath = modifyWatch.image || modifyWatch.imageUrl;
-      let uploadedImagePath = null;
 
       if (image instanceof File) {
         uploadedImagePath = await uploadImage(image);
@@ -819,59 +807,66 @@ const fetchWatches = async (userid) => {
         delete finalWatchData.image;
       }
 
-      const { data: updatedData, error: updateError } = await supabase
-        .from('watches')
-        .update(finalWatchData) 
-        .eq('id', modifyWatch.id)
-        .select()
-        .single();
+      const { data: updatedData, error: updateError } = await supabase.rpc('update_watch_with_features', {
+        p_watch_id: String(modifyWatch.id),
+        p_watch_data: finalWatchData,
+        p_features: selectedFeatures,
+      });
+      if (updateError) throw updateError;
+      updateCommitted = true;
 
-      if (updateError) {
-        if (uploadedImagePath) await deleteImage(uploadedImagePath);
-        throw updateError;
+      const updatedFeatures = allFeaturesList.filter(f => selectedFeatures.includes(f.id_caratteristica));
+      let imageUrl = null;
+      let imageUrlWarning = false;
+      try {
+        imageUrl = await getWatchImageUrl(updatedData.image);
+      } catch (imageError) {
+        imageUrlWarning = true;
+        console.error('Orologio aggiornato, ma non è stato possibile firmare la foto:', imageError);
       }
 
-      // Elimina il file precedente solo dopo che il nuovo riferimento è stato salvato.
-      if (uploadedImagePath && oldImagePath) await deleteImage(oldImagePath);
-
-      const watchId = modifyWatch.id;
-      const { error: deleteError } = await supabase
-        .from('Orologi_Caratteristiche')
-        .delete()
-        .eq('id_watch', watchId);
-      if (deleteError) throw deleteError;
-
-      if (features && features.length > 0) {
-        const relationsToInsert = features.map(featureId => ({
-          id_watch: watchId,
-          id_caratteristica: featureId
-        }));
-        const { error: insertError } = await supabase
-          .from('Orologi_Caratteristiche')
-          .insert(relationsToInsert);
-        if (insertError) throw insertError;
-      }
-      
-      const updatedFeatures = allFeaturesList.filter(f => features.includes(f.id_caratteristica));
       const locallyUpdatedWatch = {
           ...modifyWatch,
           ...updatedData,
           caratteristiche: updatedFeatures,
-          imageUrl: getImageUrl(updatedData.image)
+          imageUrl
       };
 
       setWatches(prevWatches => 
         prevWatches.map(w => w.id === modifyWatch.id ? locallyUpdatedWatch : w)
       );
 
-      setMessage(outfitEmbeddingWarning
-        ? 'Orologio aggiornato. La foto non è ancora disponibile negli abbinamenti outfit.'
-        : 'Orologio aggiornato con successo!');
+      let imageCleanupWarning = false;
+      if (uploadedImagePath && oldImagePath) {
+        try {
+          await deleteImage(oldImagePath);
+        } catch (imageError) {
+          imageCleanupWarning = true;
+          console.error('La nuova foto è stata salvata, ma la vecchia non è stata rimossa:', imageError);
+        }
+      }
+
+      setMessage(imageUrlWarning
+        ? 'Orologio aggiornato, ma la foto non è disponibile. Controlla la migrazione del bucket privato.'
+        : imageCleanupWarning
+          ? 'Orologio aggiornato, ma la vecchia foto non è stata rimossa dal deposito.'
+          : outfitEmbeddingWarning
+            ? 'Orologio aggiornato. La foto non è ancora disponibile negli abbinamenti outfit.'
+            : 'Orologio aggiornato con successo!');
       setIsModifyVisible(false);
       return true;
     } catch (error) {
       console.error("Errore durante il salvataggio delle modifiche:", error);
-      setMessage("Errore: " + error.message);
+      let cleanupWarning = false;
+      if (uploadedImagePath && !updateCommitted) {
+        try {
+          await deleteImage(uploadedImagePath);
+        } catch (imageError) {
+          cleanupWarning = true;
+          console.error('La modifica non è stata confermata e la nuova foto non è stata rimossa:', imageError);
+        }
+      }
+      setMessage(`Errore: ${error.message}${cleanupWarning ? ' La foto caricata non è stata rimossa automaticamente.' : ''}`);
       return false;
     } finally {
         setLoading(false);
@@ -1057,17 +1052,17 @@ const handleImageUpload = async (event) => {
     }
 
     if (matchedWatches && matchedWatches.length > 0) {
-      const formattedWatches = matchedWatches.map((watchMatch) => {
+      const formattedWatches = await Promise.all(matchedWatches.map(async (watchMatch) => {
         const collectionWatch = watches.find((watch) => String(watch.id) === String(watchMatch.id));
         const image = watchMatch.image || collectionWatch?.image;
-        const finalImageUrl = image?.startsWith('http') ? image : getPublicUrl(image);
+        const finalImageUrl = await getWatchImageUrl(image);
 
         return {
           ...collectionWatch,
           ...watchMatch,
           imageUrl: finalImageUrl,
         };
-      });
+      }));
       const filteredWatches = formattedWatches.filter((watch) => (
         matchesOutfitFilters(watch, outfitOccasion, outfitColorFamily)
       ));
@@ -1186,7 +1181,7 @@ const updateAllWatchEmbeddings = async () => {
       setOutfitRebuildProgress(progressMessage);
       setMessage(progressMessage);
       try {
-        const imageUrl = getImageUrl(watch.image);
+        const imageUrl = await getWatchImageUrl(watch.image);
         const imageResponse = await fetch(imageUrl);
         if (!imageResponse.ok) throw new Error(`Download foto non riuscito (${imageResponse.status}).`);
         const imageBlob = await imageResponse.blob();

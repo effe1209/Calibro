@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import FeatureCheckboxList from './FeatureCheckboxList'; // Riutilizza il componente
 import WatchOccasionSelector from './WatchOccasionSelector';
+import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
 
 // Il modale di Modifica, che è un form complesso
 const ModifyWatchModal = ({
@@ -278,6 +279,7 @@ const ModifyWatchModal = ({
               📸 Sostituisci immagine
             </button>
           </div>
+          <ExternalImageProcessingNotice />
 
           <div className="modify-watch-field modify-watch-field--wide">
             <FeatureCheckboxList

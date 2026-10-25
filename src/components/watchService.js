@@ -2,104 +2,66 @@
 
 // 1. IMPORTA LE SUE DIPENDENZE ("TOOLS")
 import { supabase } from './supabaseClient';
-import { uploadImage } from './imageService'; 
+import {
+  getWatchImageUrl,
+  removeWatchImage,
+  uploadWatchImage,
+} from './imageService';
 import { isValidWatch } from './validation';
 
 // 2. La firma della funzione non cambia
 export const addWatchService = async (options) => {
   const {
     newWatch,
-    user,
     setLoading,
     setWatches,
     setNewWatch,
     setMessage,
+    allFeaturesList,
   } = options;
 
   setLoading(true);
+  let uploadedImagePath = null;
+  let watchSaved = false;
   try {
-    // 3. Validazione (non cambia)
     if (!isValidWatch(newWatch)) {
       setMessage('Compila tutti i campi correttamente!');
-      setLoading(false);
       return false;
     }
-    console.log("Avvio dell'inserimento orologio...");
 
-    // 4. SEPARA I DATI
-    // 'features' è l'array di UUID, 'watchData' è il resto
     const { features, ...watchData } = newWatch;
-
-    // 5. CARICA IMMAGINE (come prima)
-    const imageUrl = newWatch.image
-      ? await uploadImage(newWatch.image)
+    uploadedImagePath = newWatch.image
+      ? await uploadWatchImage(newWatch.image)
       : null;
-    console.log('Immagine caricata con URL:', imageUrl);
+    const { data: savedWatch, error: watchError } = await supabase.rpc('create_watch_with_features', {
+      p_watch: { ...watchData, image: uploadedImagePath },
+      p_features: features || [],
+    });
+    if (watchError) throw watchError;
+    if (!savedWatch?.id) throw new Error('Il database non ha restituito l’orologio appena creato.');
+    watchSaved = true;
 
-    // 6. PASSO 1: Inserisci l'orologio e recupera il suo ID
-    const { data: savedWatch, error: watchError } = await supabase
-      .from('watches')
-      .insert([{
-        ...watchData,        // Dati come nome, marca, anno...
-        userid: user.id,
-        image: imageUrl      // L'URL dell'immagine caricata
-      }])
-      .select('id')   // <-- FONDAMENTALE: chiedi l'ID indietro
-      .single();      // Ci aspettiamo un solo risultato
-
-    if (watchError) {
-      throw new Error("Errore durante l'inserimento dell'orologio: " + watchError.message);
-    }
-
-    const newWatchId = savedWatch.id; // <-- L'UUID che ci serviva
-    console.log('Orologio salvato con ID:', newWatchId);
-
-    // 7. PASSO 2: Inserisci le relazioni nella tabella ponte
-    if (features && features.length > 0) {
-      // Prepara l'array di oggetti per la tabella ponte
-      const relationsToInsert = features.map(featureId => ({
-        id_watch: newWatchId,
-        id_caratteristica: featureId // Assumiamo che 'features' sia un array di UUID
-      }));
-
-      const { error: relationError } = await supabase
-        .from('Orologi_Caratteristiche') // Nome della tua tabella ponte
-        .insert(relationsToInsert);
-
-      if (relationError) {
-        // Errore critico: l'orologio è stato creato ma le caratteristiche no.
-        // In un'app reale, qui dovresti cancellare l'orologio appena creato
-        // (await supabase.from('watches').delete().eq('id', newWatchId);)
-        throw new Error("Errore durante l'associazione delle caratteristiche: " + relationError.message);
+    let imageUrl = null;
+    if (savedWatch.image) {
+      try {
+        imageUrl = await getWatchImageUrl(savedWatch.image);
+      } catch (imageError) {
+        console.error('L’orologio è stato salvato, ma non è stato possibile firmare la foto:', imageError);
       }
-      console.log('caratteristiche associate con successo.');
     }
 
-    // 8. PASSO 3: Aggiorna l'UI (con i dati completi)
-    // Per aggiornare lo stato 'watches', dobbiamo recuperare l'orologio
-    // completo di caratteristiche che abbiamo appena creato.
-    const { data: completeNewWatch, error: fetchError } = await supabase
-      .from('watches')
-      .select('*, Orologi_Caratteristiche(*, caratteristiche(*))') // Seleziona l'orologio e le sue caratteristiche
-      .eq('id', newWatchId)
-      .single();
-
-    if (fetchError) {
-      throw new Error("Errore nel recuperare l'orologio appena creato: " + fetchError.message);
-    }
-    
-    // Mantieni la stessa forma dati usata da fetchWatches, così la scheda
-    // appena aggiunta può essere modificata subito senza attendere un reload.
     const normalizedNewWatch = {
-      ...completeNewWatch,
-      caratteristiche: (completeNewWatch.Orologi_Caratteristiche || [])
-        .map((joinEntry) => joinEntry?.caratteristiche)
-        .filter(Boolean),
-      imageUrl: completeNewWatch.image,
+      ...savedWatch,
+      caratteristiche: (allFeaturesList || []).filter((feature) => (
+        (features || []).includes(feature.id_caratteristica)
+      )),
+      imageUrl,
     };
     setWatches((prevWatches) => [...prevWatches, normalizedNewWatch]);
-    
-    // 9. PASSO 4: Resetta il form (includendo 'features')
+    if (savedWatch.image && !imageUrl) {
+      setMessage('Orologio aggiunto, ma la foto non è disponibile. Controlla la migrazione del bucket privato.');
+    }
+
     setNewWatch({
       name: '',
       brand: '',
@@ -123,13 +85,21 @@ export const addWatchService = async (options) => {
       warranty_provider: '',
       note: '',
     });
-    setMessage('Orologio aggiunto con successo!');
     return normalizedNewWatch;
 
   } catch (error) {
+    let cleanupError = null;
+    if (uploadedImagePath && !watchSaved) {
+      try {
+        await removeWatchImage(uploadedImagePath);
+      } catch (imageError) {
+        cleanupError = imageError;
+        console.error('Non è stato possibile rimuovere la foto dopo il mancato salvataggio:', imageError);
+      }
+    }
     console.error("Errore durante l'inserimento:", error);
     setMessage(
-      "Errore durante l'inserimento: " + (error.message || 'Si è verificato un errore.')
+      `Errore durante l'inserimento: ${error.message || 'Si è verificato un errore.'}${cleanupError ? ' La foto caricata non è stata rimossa automaticamente.' : ''}`
     );
     throw error;
   } finally {

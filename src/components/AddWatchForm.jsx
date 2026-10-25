@@ -2,6 +2,7 @@ import React from 'react';
 import FeatureCheckboxList from './FeatureCheckboxList'; // Importa il nuovo componente
 import Stepper, { Step } from './Stepper';
 import WatchOccasionSelector from './WatchOccasionSelector';
+import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
 
 
 // Questo è solo il Form per aggiungere un orologio
@@ -212,6 +213,7 @@ const AddWatchForm = ({
               📸 Seleziona un'immagine
             </button>
           </div>
+          <ExternalImageProcessingNotice />
           {newWatch.image && typeof newWatch.image === 'object' && (
             <img
               src={URL.createObjectURL(newWatch.image)}
