@@ -1590,7 +1590,6 @@ const BackgroundLayer = useMemo(() => {
           logoHeight={20}
           gap={24}
           pauseOnHover={false}
-          enabled={!isCompactViewport}
           ariaLabel="Marchi di orologi"
           renderItem={(brand, itemKey) => {
             const isHovered = hoveredBrand?.itemKey === itemKey;
