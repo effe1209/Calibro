@@ -3637,7 +3637,8 @@ a:focus-visible,
 }
 
 .watch-detail-actions .favoriteButton__button,
-.watch-detail-actions .modal-delete-btn {
+.watch-detail-actions .modal-delete-btn,
+.watch-detail-actions .modal-share-btn {
   position: static;
   display: grid;
   width: 42px;
@@ -3650,6 +3651,15 @@ a:focus-visible,
   color: var(--ui-accent);
   font-size: 1.2rem;
   line-height: 1;
+}
+
+.watch-detail-actions .modal-share-btn {
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, opacity 120ms ease;
+}
+
+.watch-detail-actions .modal-share-btn:hover {
+  background: var(--ui-accent-soft);
 }
 
 .watch-detail-actions .modal-delete-btn svg {
@@ -7985,6 +7995,23 @@ a:focus-visible,
   }
 }
 
+html.capacitor-native,
+html.capacitor-native body {
+  min-height: 100dvh;
+}
+
+html.capacitor-native body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html.capacitor-native #root {
+  min-height: calc(100dvh - env(safe-area-inset-bottom, 0px));
+}
+
+html.capacitor-native .dock-panel {
+  bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* Barra globale fuori dal flusso di scorrimento: resta sempre raggiungibile su iOS. */
 .slideWrap_Container {
   position: fixed;
@@ -8123,6 +8150,55 @@ a:focus-visible,
 
 .collection-export-menu > summary::-webkit-details-marker {
   display: none;
+}
+
+button,
+a,
+[role="button"],
+summary,
+select,
+input[type="button"],
+input[type="submit"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button:not(:disabled), a, [role="button"], summary):active {
+  opacity: 0.78;
+  transition: opacity 120ms ease-out;
+}
+
+.modal-overlay,
+.outfit-modal-overlay {
+  animation: native-overlay-enter 180ms ease-out both;
+}
+
+.modal-content,
+.outfit-modal {
+  animation: native-sheet-enter 220ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+@keyframes native-overlay-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes native-sheet-enter {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .outfit-modal-overlay,
+  .modal-content,
+  .outfit-modal {
+    animation: none;
+  }
+
+  :where(button:not(:disabled), a, [role="button"], summary):active {
+    transition: none;
+  }
 }
 
 .message {

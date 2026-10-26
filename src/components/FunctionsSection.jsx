@@ -1,4 +1,5 @@
 import React from 'react';
+import { triggerSelectionFeedback } from './nativeFeedback';
 import { OUTFIT_COLOR_FAMILIES, OUTFIT_OCCASIONS } from './outfitPreferences';
 import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
 
@@ -45,7 +46,10 @@ const FunctionsSection = ({
         <div className="outfit-preferences">
           <label>
             <span>Occasione</span>
-            <select value={outfitOccasion} onChange={(event) => setOutfitOccasion(event.target.value)}>
+            <select value={outfitOccasion} onChange={(event) => {
+              void triggerSelectionFeedback();
+              setOutfitOccasion(event.target.value);
+            }}>
               <option value="all">Tutte le occasioni</option>
               {OUTFIT_OCCASIONS.map(({ value, label }) => (
                 <option key={value} value={value}>{label}</option>
@@ -54,7 +58,10 @@ const FunctionsSection = ({
           </label>
           <label>
             <span>Colore dell’orologio</span>
-            <select value={outfitColorFamily} onChange={(event) => setOutfitColorFamily(event.target.value)}>
+            <select value={outfitColorFamily} onChange={(event) => {
+              void triggerSelectionFeedback();
+              setOutfitColorFamily(event.target.value);
+            }}>
               <option value="all">Tutti i colori</option>
               {OUTFIT_COLOR_FAMILIES.map(({ value, label }) => (
                 <option key={value} value={value}>{label}</option>

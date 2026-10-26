@@ -1,7 +1,11 @@
 import React, { lazy, Suspense, useState, useEffect, useRef, useTransition, useMemo, useCallback } from "react";
 import { createPortal } from 'react-dom';
 import imageCompression from 'browser-image-compression';
+import { Capacitor } from '@capacitor/core';
+import { Share } from '@capacitor/share';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { getOptimizedOutfitEmbedding, getOutfitEmbedding } from './components/outfitService';
+import { triggerLightImpact } from './components/nativeFeedback';
 // Import Supabase e servizi (invariati)
 import { supabase } from './components/supabaseClient';
 import { addWatchService } from './components/watchService';
@@ -275,6 +279,22 @@ function App() {
     return () => observer.disconnect();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return undefined;
+
+    const shortcut = new URLSearchParams(window.location.search).get('shortcut');
+    const sectionId = {
+      collection: 'watch-list-section',
+      functions: 'function-section',
+    }[shortcut];
+    if (!sectionId) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [user]);
+
 
   // Effetti di scroll e anchor link
   useEffect(() => {
@@ -477,6 +497,7 @@ const handleAddWatch = async () => {
     const added = await addWatchService(stateOptions);
     if (!added) return;
 
+    void triggerLightImpact();
     let outfitEmbeddingWarning = false;
     if (newWatch.image instanceof File && added.id) {
       setLoading(true);
@@ -627,6 +648,7 @@ const handleAddWatch = async () => {
       if (watches && watches.length > 0) {
         const randomIndex = Math.floor(Math.random() * watches.length);
         const randomWatch = watches[randomIndex];
+        void triggerLightImpact();
         setSelectedWatch(randomWatch);
         setModalTitle("Orologio del Giorno");
         setIsModalVisible(true);
@@ -695,8 +717,30 @@ const handleAddWatch = async () => {
   };
 
   const handleInfoWatch = (watchToShow) => {
+    void triggerLightImpact();
     setSelectedWatch(watchToShow);
     setIsInfoVisible(true);
+  };
+
+  const handleShareWatch = async (watch) => {
+    const description = [watch.brand, watch.name, watch.year]
+      .filter(Boolean)
+      .join(' ');
+    const text = `Scopri ${description} dalla mia collezione Calibro.`;
+
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({ title: watch.name, text });
+      } else if (typeof navigator.share === 'function') {
+        await navigator.share({ title: watch.name, text });
+      } else {
+        setMessage('La condivisione non è disponibile su questo browser.');
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+      console.error('Impossibile condividere l’orologio:', error);
+      setMessage('Non è stato possibile aprire il foglio di condivisione.');
+    }
   };
 
   const handleMaintenanceChanged = () => {
@@ -823,6 +867,7 @@ const handleFavoriteToggle = async (watchId) => {
     
     // 2. Calcoliamo il nuovo stato
     const newFavoriteState = !currentWatch.isFavorite;
+    void triggerLightImpact();
 
     // 3. AGGIORNAMENTO OTTIMISTICO (UI Immediata)
     startTransition(() => {
@@ -983,6 +1028,7 @@ const handleImageUpload = async (event) => {
           .slice(0, 8)
       );
       setIsCarouselVisible(true);
+      void triggerLightImpact();
       setMessage(filtersRelaxed
         ? 'Nessun orologio corrisponde a tutti i filtri: ti mostro i più vicini alla foto.'
         : 'Ecco gli abbinamenti dalla tua collezione.');
@@ -1216,8 +1262,31 @@ const watchBrands = useMemo(() => [
     }
   }, [isDark]);
 
+  useEffect(() => {
+    const isNative = Capacitor.isNativePlatform();
+    document.documentElement.classList.toggle('capacitor-native', isNative);
+    if (!isNative) return undefined;
+
+    const syncNativeChrome = async () => {
+      try {
+        await StatusBar.setOverlaysWebView({ overlay: true });
+        await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+        const themeColor = isDark ? '#0b131c' : '#f4f7fa';
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+      } catch (error) {
+        console.error('Impossibile sincronizzare la barra di stato iOS:', error);
+      }
+    };
+
+    void syncNativeChrome();
+    return () => document.documentElement.classList.remove('capacitor-native');
+  }, [isDark]);
+
   // Funzione helper per cambiare stato (opzionale, ma pulita)
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = () => {
+    void triggerLightImpact();
+    setIsDark((current) => !current);
+  };
 
   const isOverlayOpen = loading
     || isModalVisible
@@ -1613,6 +1682,7 @@ const BackgroundLayer = useMemo(() => {
             selectedWatch={selectedWatch}
             handleDeleteWatch={handleDeleteWatch}
             handleFavoriteToggle={handleFavoriteToggle}
+            onShareWatch={handleShareWatch}
             userId={user?.id}
             onMaintenanceChanged={handleMaintenanceChanged}
           />
