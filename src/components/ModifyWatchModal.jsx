@@ -278,9 +278,9 @@ const ModifyWatchModal = ({
               <button type="button" className="upload-button" onClick={() => fileInputRef.current?.click()}>
                 📸 Sostituisci immagine
               </button>
+              <ExternalImageProcessingNotice />
             </div>
           </div>
-          <ExternalImageProcessingNotice />
 
           <div className="modify-watch-field modify-watch-field--wide">
             <FeatureCheckboxList

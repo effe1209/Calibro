@@ -6401,10 +6401,12 @@ a:focus-visible,
 }
 
 .external-image-processing-notice {
-  margin: 8px 0 0;
+  margin: 8px 5% 0;
   color: var(--ui-muted);
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   line-height: 1.45;
+  max-width: 50%;
+  text-align: left;
 }
 
 #function-section .function-card__copy .external-image-processing-notice {
