@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import FavoriteButton from './FavoriteButton';
 import { Share2 } from 'lucide-react';
 import WatchDetails from './WatchDetails';
@@ -30,7 +31,7 @@ const InfoWatchModal = ({
     return null;
   }
   
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={() => setIsVisible(false)}>
       <div className="infoView watch-detail-modal" onClick={(event) => event.stopPropagation()}>
         <div className="modal-content watch-detail-card" role="dialog" aria-modal="true" aria-labelledby="watch-detail-title">
@@ -80,7 +81,8 @@ const InfoWatchModal = ({
           </footer>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
