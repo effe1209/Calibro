@@ -32,7 +32,7 @@ const InfoWatchModal = ({
   }
   
   return createPortal(
-    <div className="modal-overlay" onClick={() => setIsVisible(false)}>
+    <div className="modal-overlay watch-detail-overlay" onClick={() => setIsVisible(false)}>
       <div className="infoView watch-detail-modal" onClick={(event) => event.stopPropagation()}>
         <div className="modal-content watch-detail-card" role="dialog" aria-modal="true" aria-labelledby="watch-detail-title">
           <header className="watch-detail-heading">
