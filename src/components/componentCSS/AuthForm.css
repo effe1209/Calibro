@@ -189,10 +189,19 @@
 }
 
 .toggle-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
   color: var(--ui-accent);
+  font-family: inherit;
   font-size: 0.9rem;
+  font-weight: 700;
   text-decoration: none !important;
   transition: opacity 180ms ease;
+  cursor: pointer;
 }
 
 .toggle-link:hover {

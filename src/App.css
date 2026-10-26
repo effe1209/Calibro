@@ -8248,6 +8248,60 @@ input[type="submit"] {
   outline-offset: 2px;
 }
 
+.external-image-processing-notice,
+.add-watch-form .step-default > p.external-image-processing-notice,
+#function-section .function-card__copy > p.external-image-processing-notice {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  align-self: stretch;
+}
+
+#root button:not(:disabled),
+#root select,
+#root summary {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#root .watch-detail-actions .favoriteButton__button,
+#root .watch-detail-actions .modal-delete-btn,
+#root .watch-detail-actions .modal-share-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#root .watch-occasion-selector__options label,
+#root .watch-feature-selector__options label,
+#root .watch-equipment-check,
+#root .notification-settings__option,
+#root .collection-favorites-filter,
+#root .brand-strip .brand-pill {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@supports (-webkit-touch-callout: none) {
+  #root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]),
+  #root select,
+  #root textarea {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root input,
+  #root select,
+  #root textarea,
+  #root button,
+  #root a,
+  #root summary {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 .collection-export-menu__chevron {
   margin-left: 1px;
   font-size: 1.05em;

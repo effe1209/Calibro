@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FeatureCheckboxList from './FeatureCheckboxList'; // Riutilizza il componente
 import WatchOccasionSelector from './WatchOccasionSelector';
 import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
+import { triggerLightImpact } from './nativeFeedback';
+import { useObjectUrl } from './useObjectUrl';
 
 // Il modale di Modifica, che è un form complesso
 const ModifyWatchModal = ({
@@ -18,6 +20,9 @@ const ModifyWatchModal = ({
   const [updatedWatch, setUpdatedWatch] = useState(initialWatch);
   const [isNotesVisibleMOD, setIsNotesVisibleMOD] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
+  const localPreviewImageUrl = useObjectUrl(
+    typeof Blob !== 'undefined' && updatedWatch?.image instanceof Blob ? updatedWatch.image : null
+  );
 
   const hasUnsavedChanges = Boolean(initialWatch && updatedWatch) && [
     'name', 'brand', 'year', 'money', 'purchase_date', 'declared_value', 'condition_rating', 'movement', 'color',
@@ -65,7 +70,6 @@ const ModifyWatchModal = ({
       setUpdatedWatch((currentWatch) => ({
         ...currentWatch,
         image: file,
-        imageUrl: URL.createObjectURL(file),
       }));
     }
   };
@@ -80,13 +84,6 @@ const ModifyWatchModal = ({
         : currentWatch.features.filter((feature) => feature !== numericValue),
     }));
   };
-
-  useEffect(() => {
-    if (updatedWatch?.imageUrl?.startsWith('blob:')) {
-      return () => URL.revokeObjectURL(updatedWatch.imageUrl);
-    }
-    return undefined;
-  }, [updatedWatch?.imageUrl]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -112,13 +109,7 @@ const ModifyWatchModal = ({
     return null;
   }
   
-  // Determina quale immagine mostrare:
-  // 1. L'URL dell'immagine appena caricata (da updatedWatch.imageUrl se è un blob URL)
-  // 2. L'URL dell'immagine esistente (da updatedWatch.imageUrl se è un URL supabase)
-  // 3. Un'immagine di fallback
-  const previewImageUrl = (updatedWatch.imageUrl && updatedWatch.imageUrl.startsWith('blob:')) 
-    ? updatedWatch.imageUrl 
-    : (updatedWatch.imageUrl || "orologio_back.svg");
+  const previewImageUrl = localPreviewImageUrl || updatedWatch.imageUrl || "orologio_back.svg";
 
   return (
     <div
@@ -138,8 +129,9 @@ const ModifyWatchModal = ({
         
         <div className="formModify modify-watch-form">
           <div className="modify-watch-field">
-            <label>Nome: </label>
+            <label htmlFor="modify-watch-name">Nome: </label>
             <input
+              id="modify-watch-name"
               type="text"
               value={updatedWatch.name}
               onChange={(e) => setUpdatedWatch({ ...updatedWatch, name: e.target.value })}
@@ -147,8 +139,9 @@ const ModifyWatchModal = ({
           </div>
 
           <div className="modify-watch-field">
-            <label>Marca: </label>
+            <label htmlFor="modify-watch-brand">Marca: </label>
             <input
+              id="modify-watch-brand"
               type="text"
               value={updatedWatch.brand}
               onChange={(e) => setUpdatedWatch({ ...updatedWatch, brand: e.target.value })}
@@ -156,8 +149,9 @@ const ModifyWatchModal = ({
           </div>
 
           <div className="modify-watch-field">
-            <label>Anno: </label>
+            <label htmlFor="modify-watch-year">Anno: </label>
             <input
+              id="modify-watch-year"
               type="text"
               value={updatedWatch.year}
               onChange={(e) => setUpdatedWatch({ ...updatedWatch, year: e.target.value })}
@@ -165,8 +159,9 @@ const ModifyWatchModal = ({
           </div>
 
           <div className="modify-watch-field">
-            <label>Prezzo di acquisto</label>
+            <label htmlFor="modify-watch-price">Prezzo di acquisto</label>
             <input
+              id="modify-watch-price"
               type="number"
               value={updatedWatch.money ?? ''}
               onChange={(e) => setUpdatedWatch({ ...updatedWatch, money: e.target.value ? Number(e.target.value) : null })}
@@ -216,8 +211,9 @@ const ModifyWatchModal = ({
           </div>
 
           <div className="modify-watch-field">
-            <label><strong>Movimento</strong></label>
+            <label htmlFor="modify-watch-movement"><strong>Movimento</strong></label>
             <select
+              id="modify-watch-movement"
               value={updatedWatch.movement}
               onChange={(e) => setUpdatedWatch({ ...updatedWatch, movement: e.target.value })}
             >
@@ -229,13 +225,14 @@ const ModifyWatchModal = ({
           </div>
 
           <div className="modify-watch-field">
-            <label><strong>Colore</strong></label>
+            <label htmlFor="color-modify"><strong>Colore</strong></label>
             <div className="color-picker-container">
               <button
                 type="button"
                 className="color-picker-button"
                 style={{ backgroundColor: updatedWatch.color || ""}}
                 tabIndex="-1"
+                aria-hidden="true"
               >
                 🎨 Scegli un colore
               </button>
@@ -243,6 +240,7 @@ const ModifyWatchModal = ({
                 type="color"
                 id="color-modify"
                 className="color-input-overlay"
+                aria-label="Seleziona il colore dell'orologio"
                 value={updatedWatch.color || ''}
                 onChange={(e) => setUpdatedWatch({ ...updatedWatch, color: e.target.value })}
               />
@@ -275,7 +273,10 @@ const ModifyWatchModal = ({
                 loading="lazy"
                 onError={(event) => { event.currentTarget.src = 'orologio_back.svg'; }}
               />
-              <button type="button" className="upload-button" onClick={() => fileInputRef.current?.click()}>
+              <button type="button" className="upload-button" onClick={() => {
+                void triggerLightImpact();
+                fileInputRef.current?.click();
+              }}>
                 📸 Sostituisci immagine
               </button>
               <ExternalImageProcessingNotice />
@@ -347,6 +348,7 @@ const ModifyWatchModal = ({
               <textarea
                 placeholder="Note aggiuntive..."
                 className="notes-textarea"
+                aria-label="Note aggiuntive sull'orologio"
                 value={updatedWatch.note}
                 onChange={(e) =>
                   setUpdatedWatch({ ...updatedWatch, note: e.target.value })
@@ -358,7 +360,7 @@ const ModifyWatchModal = ({
 
         <div className="buttonForm">
           <button type="button" className="funzioniButton" onClick={() => handleSaveChanges(updatedWatch)}>Salva</button>
-          <button className="funzioniButton" onClick={requestClose}>Chiudi</button>
+          <button type="button" className="funzioniButton" onClick={requestClose}>Chiudi</button>
         </div>
       </div>
       {showExitPrompt && (

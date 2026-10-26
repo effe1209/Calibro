@@ -22,6 +22,7 @@ const FavoriteButton = ({ isFavorite, onToggle }) => {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       className={`favoriteButton__button ${animationClass}`}
       aria-label={isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
@@ -32,4 +33,3 @@ const FavoriteButton = ({ isFavorite, onToggle }) => {
 };
 
 export default FavoriteButton;
-

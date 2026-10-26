@@ -64,6 +64,7 @@ const AuthForm = ({
 
         <div className="actions">
           <button 
+            type="button"
             className="primary-btn"
             style={{ width: '100%', padding: '10px', cursor: 'pointer', marginTop: '1rem' }}
             onClick={isLogin ? handleLogin : handleRegister}
@@ -73,13 +74,13 @@ const AuthForm = ({
 
           <p className="toggle-text">
             {isLogin ? "Non hai un account?" : "Hai già un account?"}{' '}
-            <span 
-              className="toggle-link" 
-              style={{ fontWeight: 'bold', cursor: 'pointer', textDecoration: 'underline' }}
-              onClick={() => setIsLogin(!isLogin)}
+            <button
+              type="button"
+              className="toggle-link"
+              onClick={() => setIsLogin((current) => !current)}
             >
               {isLogin ? 'Creane uno' : 'Accedi'}
-            </span>
+            </button>
           </p>
         </div>
       </div>
