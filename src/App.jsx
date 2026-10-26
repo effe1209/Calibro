@@ -1267,9 +1267,13 @@ const watchBrands = useMemo(() => [
     document.documentElement.classList.toggle('capacitor-native', isNative);
     if (!isNative) return undefined;
 
-    const syncNativeChrome = async () => {
+    const compactViewport = window.matchMedia('(max-width: 720px)');
+    const isIOS = Capacitor.getPlatform() === 'ios';
+    const syncNativeChrome = async (isCompactViewport = compactViewport.matches) => {
       try {
-        await StatusBar.setOverlaysWebView({ overlay: true });
+        await StatusBar.setOverlaysWebView({
+          overlay: !isIOS || !isCompactViewport,
+        });
         await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
         const themeColor = isDark ? '#0b131c' : '#f4f7fa';
         document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
@@ -1279,7 +1283,14 @@ const watchBrands = useMemo(() => [
     };
 
     void syncNativeChrome();
-    return () => document.documentElement.classList.remove('capacitor-native');
+    const handleViewportChange = (event) => {
+      if (isIOS) void syncNativeChrome(event.matches);
+    };
+    compactViewport.addEventListener('change', handleViewportChange);
+    return () => {
+      compactViewport.removeEventListener('change', handleViewportChange);
+      document.documentElement.classList.remove('capacitor-native');
+    };
   }, [isDark]);
 
   // Funzione helper per cambiare stato (opzionale, ma pulita)
