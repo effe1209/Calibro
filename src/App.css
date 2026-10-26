@@ -8216,34 +8216,7 @@ input[type="submit"] {
   transition: opacity 120ms ease-out;
 }
 
-.modal-overlay,
-.outfit-modal-overlay {
-  animation: native-overlay-enter 180ms ease-out both;
-}
-
-.modal-content,
-.outfit-modal {
-  animation: native-sheet-enter 220ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-}
-
-@keyframes native-overlay-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes native-sheet-enter {
-  from { opacity: 0; transform: translateY(10px) scale(0.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .modal-overlay,
-  .outfit-modal-overlay,
-  .modal-content,
-  .outfit-modal {
-    animation: none;
-  }
-
   :where(button:not(:disabled), a, [role="button"], summary):active {
     transition: none;
   }
