@@ -6419,6 +6419,10 @@ a:focus-visible,
   text-align: left;
 }
 
+.add-watch-form .step-default > .external-image-processing-notice {
+  max-width: 100%;
+}
+
 #function-section .function-card__copy .external-image-processing-notice {
   margin-top: 8px;
   font-size: 0.75rem;
