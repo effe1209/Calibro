@@ -8987,3 +8987,26 @@ input[type="checkbox"]:not(.MuiSwitch-input):focus-visible {
   outline: 3px solid var(--ui-accent-soft);
   outline-offset: 2px;
 }
+
+@media (max-width: 720px) {
+  .slideWrap_Container > .global-navigation-glass,
+  .slideWrap_Container > .global-navigation-glass.glass-surface--svg,
+  .slideWrap_Container > .global-navigation-glass.glass-surface--fallback {
+    background: #f4f7fa !important;
+    box-shadow: inset 0 0 0 1px rgba(24, 48, 62, 0.12) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  .slideWrap_Container > .global-navigation-glass::before {
+    display: none !important;
+  }
+
+  .dark-mode .slideWrap_Container > .global-navigation-glass,
+  .dark-mode .slideWrap_Container > .global-navigation-glass.glass-surface--svg,
+  .dark-mode .slideWrap_Container > .global-navigation-glass.glass-surface--fallback {
+    background: #12202d !important;
+    box-shadow: inset 0 0 0 1px rgba(232, 248, 252, 0.16) !important;
+  }
+}
