@@ -1,0 +1,398 @@
+{
+  "backup/AddWatch_restore.jsx": {
+    "mtime": 1761411572.3661513,
+    "seen": 1792680031.873186,
+    "ast_hash": "80a089661af90d6d7705ca708dff0075",
+    "semantic_hash": "80a089661af90d6d7705ca708dff0075"
+  },
+  "backup/uploadImage_restore.jsx": {
+    "mtime": 1761411668.2130663,
+    "seen": 1792680031.8731892,
+    "ast_hash": "61c4eca81803d61b3225eed56ce2c794",
+    "semantic_hash": "61c4eca81803d61b3225eed56ce2c794"
+  },
+  "capacitor.config.json": {
+    "mtime": 1792680406.8172495,
+    "seen": 1793021966.288071,
+    "ast_hash": "32b007b07f13495366ef8d1b21f8277e",
+    "semantic_hash": "32b007b07f13495366ef8d1b21f8277e"
+  },
+  "eslint.config.js": {
+    "mtime": 1792944012.9161787,
+    "seen": 1793021966.288073,
+    "ast_hash": "21534e2b9f7ec6b2cd71bed18b151257",
+    "semantic_hash": "21534e2b9f7ec6b2cd71bed18b151257"
+  },
+  "ios/App/App/AppDelegate.swift": {
+    "mtime": 1755723804.0,
+    "seen": 1792680031.8731918,
+    "ast_hash": "b2865a48d0e54c1613fa58272418bf98",
+    "semantic_hash": "b2865a48d0e54c1613fa58272418bf98"
+  },
+  "ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+    "mtime": 1755723804.0,
+    "seen": 1792680031.8731918,
+    "ast_hash": "7453c3002126811a57c38b2740f990cf",
+    "semantic_hash": "7453c3002126811a57c38b2740f990cf"
+  },
+  "ios/App/App/Assets.xcassets/Contents.json": {
+    "mtime": 1755723804.0,
+    "seen": 1792680031.873193,
+    "ast_hash": "31cc68f34934a99c0b0c1bebde56309c",
+    "semantic_hash": "31cc68f34934a99c0b0c1bebde56309c"
+  },
+  "ios/App/App/Assets.xcassets/Splash.imageset/Contents.json": {
+    "mtime": 1755723804.0,
+    "seen": 1792680031.873193,
+    "ast_hash": "1162e1cddd7ea769bcacdd1aa7b4ac72",
+    "semantic_hash": "1162e1cddd7ea769bcacdd1aa7b4ac72"
+  },
+  "package.json": {
+    "mtime": 1793017043.3299148,
+    "seen": 1793021966.288217,
+    "ast_hash": "9d31fc52787667338d0ce54d48078171",
+    "semantic_hash": "9d31fc52787667338d0ce54d48078171"
+  },
+  "src/App.jsx": {
+    "mtime": 1793022256.0161583,
+    "seen": 1793022262.1135502,
+    "ast_hash": "39eaad6135f1e54087d7b18083ec54e1",
+    "semantic_hash": "39eaad6135f1e54087d7b18083ec54e1"
+  },
+  "src/components/AddWatchForm.jsx": {
+    "mtime": 1792944012.9312966,
+    "seen": 1793021966.28822,
+    "ast_hash": "48876eb2bc85a3e029ac82797b9fce6b",
+    "semantic_hash": "48876eb2bc85a3e029ac82797b9fce6b"
+  },
+  "src/components/AuthForm.jsx": {
+    "mtime": 1792663377.994078,
+    "seen": 1792680031.873197,
+    "ast_hash": "6196ac1b033050da9a41d2a81ec32d45",
+    "semantic_hash": "6196ac1b033050da9a41d2a81ec32d45"
+  },
+  "src/components/CircularText.jsx": {
+    "mtime": 1763773822.0288548,
+    "seen": 1792680031.873197,
+    "ast_hash": "5336974d7cb3fccc1f7959083c7451bc",
+    "semantic_hash": "5336974d7cb3fccc1f7959083c7451bc"
+  },
+  "src/components/Clock.jsx": {
+    "mtime": 1792663377.9943137,
+    "seen": 1792680031.873198,
+    "ast_hash": "a7483ff9be742d307c4752fbcc9d2df0",
+    "semantic_hash": "a7483ff9be742d307c4752fbcc9d2df0"
+  },
+  "src/components/DarkModeSwitch.jsx": {
+    "mtime": 1793022126.5505872,
+    "seen": 1793022206.829717,
+    "ast_hash": "7335c8340f9eb29a80e8bd69563fb950",
+    "semantic_hash": "7335c8340f9eb29a80e8bd69563fb950"
+  },
+  "src/components/DayWatchModal.jsx": {
+    "mtime": 1793017043.33201,
+    "seen": 1793021966.288307,
+    "ast_hash": "bc68384aa378f85435fb946fd0843947",
+    "semantic_hash": "bc68384aa378f85435fb946fd0843947"
+  },
+  "src/components/Dock.jsx": {
+    "mtime": 1792799706.3630152,
+    "seen": 1793021966.288308,
+    "ast_hash": "cc3844aa34a02d701e14480d420628bd",
+    "semantic_hash": "cc3844aa34a02d701e14480d420628bd"
+  },
+  "src/components/ElectricBorder.jsx": {
+    "mtime": 1763773822.0296588,
+    "seen": 1792680031.8732002,
+    "ast_hash": "f0fce612e788a8dff9ee203a744e7502",
+    "semantic_hash": "f0fce612e788a8dff9ee203a744e7502"
+  },
+  "src/components/FavoriteButton.jsx": {
+    "mtime": 1764202679.5628233,
+    "seen": 1792680031.8732018,
+    "ast_hash": "7f0fd230b817571cd59dda9be65496b6",
+    "semantic_hash": "7f0fd230b817571cd59dda9be65496b6"
+  },
+  "src/components/FeatureCheckboxList.jsx": {
+    "mtime": 1792944012.9329448,
+    "seen": 1793021966.288364,
+    "ast_hash": "bd56845ec7197361c1ff0bdccb7625cd",
+    "semantic_hash": "bd56845ec7197361c1ff0bdccb7625cd"
+  },
+  "src/components/FloatingLines.jsx": {
+    "mtime": 1763773822.029789,
+    "seen": 1792680031.873203,
+    "ast_hash": "fa41b20c78cd43e3119e89243fd3893f",
+    "semantic_hash": "fa41b20c78cd43e3119e89243fd3893f"
+  },
+  "src/components/FunctionsSection.jsx": {
+    "mtime": 1792944012.9332228,
+    "seen": 1793021966.2883918,
+    "ast_hash": "73a4245a50b34dd8ec84fe58355c5c9c",
+    "semantic_hash": "73a4245a50b34dd8ec84fe58355c5c9c"
+  },
+  "src/components/GlassSurface.jsx": {
+    "mtime": 1763834814.972496,
+    "seen": 1792680031.873205,
+    "ast_hash": "5f6d218fd1f7d9a623ec8ac28fca243c",
+    "semantic_hash": "5f6d218fd1f7d9a623ec8ac28fca243c"
+  },
+  "src/components/InfiniteGridModal.jsx": {
+    "mtime": 1792663377.9956212,
+    "seen": 1792680031.873205,
+    "ast_hash": "5b3c7d93c4a39a732b6c392f142d5732",
+    "semantic_hash": "5b3c7d93c4a39a732b6c392f142d5732"
+  },
+  "src/components/InfiniteMenu.jsx": {
+    "mtime": 1792663377.9958577,
+    "seen": 1792680031.873206,
+    "ast_hash": "f7bd83f9f2612900becdbba09a98a816",
+    "semantic_hash": "f7bd83f9f2612900becdbba09a98a816"
+  },
+  "src/components/InfoWatchModal.jsx": {
+    "mtime": 1792715231.9914727,
+    "seen": 1793021966.2885141,
+    "ast_hash": "d721ca5779986daf0a44bcd466c57f51",
+    "semantic_hash": "d721ca5779986daf0a44bcd466c57f51"
+  },
+  "src/components/Iridescence.jsx": {
+    "mtime": 1792944012.9334862,
+    "seen": 1793021966.2885141,
+    "ast_hash": "a263d2a027207f634ffddce7059f49c7",
+    "semantic_hash": "a263d2a027207f634ffddce7059f49c7"
+  },
+  "src/components/LogoLoop.jsx": {
+    "mtime": 1792925333.8367078,
+    "seen": 1793021966.288515,
+    "ast_hash": "26412ac6e2681745773975deb851704c",
+    "semantic_hash": "26412ac6e2681745773975deb851704c"
+  },
+  "src/components/MetaBalls.jsx": {
+    "mtime": 1792663377.9962943,
+    "seen": 1792680031.873208,
+    "ast_hash": "b229c83d9c59f00c40cb5e0acb2af539",
+    "semantic_hash": "b229c83d9c59f00c40cb5e0acb2af539"
+  },
+  "src/components/ModifyWatchModal.jsx": {
+    "mtime": 1793017043.332439,
+    "seen": 1793021966.288547,
+    "ast_hash": "63add7775fcc729c0bf2089dc239d699",
+    "semantic_hash": "63add7775fcc729c0bf2089dc239d699"
+  },
+  "src/components/OutfitModal.jsx": {
+    "mtime": 1792799706.364375,
+    "seen": 1793021966.288548,
+    "ast_hash": "17fd9572652b53c89d67c8fdd52212ee",
+    "semantic_hash": "17fd9572652b53c89d67c8fdd52212ee"
+  },
+  "src/components/Plasma.jsx": {
+    "mtime": 1792944012.9341633,
+    "seen": 1793021966.2885492,
+    "ast_hash": "efc8621c7abdeab5fa0d2232e9336fb0",
+    "semantic_hash": "efc8621c7abdeab5fa0d2232e9336fb0"
+  },
+  "src/components/ScrollingBrands.jsx": {
+    "mtime": 1761836639.4760218,
+    "seen": 1792680031.873211,
+    "ast_hash": "0a8165cf9ce83cbd79acf4a194693377",
+    "semantic_hash": "0a8165cf9ce83cbd79acf4a194693377"
+  },
+  "src/components/StatsModal.jsx": {
+    "mtime": 1792719265.777961,
+    "seen": 1793021966.2885802,
+    "ast_hash": "538e72d015bd36edbab2b51f260745f7",
+    "semantic_hash": "538e72d015bd36edbab2b51f260745f7"
+  },
+  "src/components/Stepper.jsx": {
+    "mtime": 1792944012.9345658,
+    "seen": 1793021966.2885811,
+    "ast_hash": "47babfc71f624d8ae9c76114ae474e06",
+    "semantic_hash": "47babfc71f624d8ae9c76114ae474e06"
+  },
+  "src/components/TiltedCard.jsx": {
+    "mtime": 1793017043.3331666,
+    "seen": 1793021966.2885818,
+    "ast_hash": "b89006f7b12d865a838a93ce895f52b0",
+    "semantic_hash": "b89006f7b12d865a838a93ce895f52b0"
+  },
+  "src/components/UserProfile.jsx": {
+    "mtime": 1792944012.934806,
+    "seen": 1793021966.2885818,
+    "ast_hash": "9331fdfd131ed1f79696f7709eacb5df",
+    "semantic_hash": "9331fdfd131ed1f79696f7709eacb5df"
+  },
+  "src/components/WatchAnalytics.jsx": {
+    "mtime": 1792799706.3651686,
+    "seen": 1793021966.2885828,
+    "ast_hash": "7c1c336881a09dfd257489bb2b26fac4",
+    "semantic_hash": "7c1c336881a09dfd257489bb2b26fac4"
+  },
+  "src/components/WatchDetails.jsx": {
+    "mtime": 1793017043.3336048,
+    "seen": 1793021966.288584,
+    "ast_hash": "4e19e49fce1d08abea75d6510f6cc443",
+    "semantic_hash": "4e19e49fce1d08abea75d6510f6cc443"
+  },
+  "src/components/WatchList.jsx": {
+    "mtime": 1793017043.3340135,
+    "seen": 1793021966.288584,
+    "ast_hash": "69a44d06e4fe1f520bd4e4449b69b09e",
+    "semantic_hash": "69a44d06e4fe1f520bd4e4449b69b09e"
+  },
+  "src/components/WatchMovementComplication.jsx": {
+    "mtime": 1792663377.9980025,
+    "seen": 1792680031.873215,
+    "ast_hash": "d149aca30d450b36a47d84d62b2fe710",
+    "semantic_hash": "d149aca30d450b36a47d84d62b2fe710"
+  },
+  "src/components/componentCSS/dsd.jsx": {
+    "mtime": 1764265909.229158,
+    "seen": 1792680031.873216,
+    "ast_hash": "56b552ffc6b655d6ab061ac9b3f1f97b",
+    "semantic_hash": "56b552ffc6b655d6ab061ac9b3f1f97b"
+  },
+  "src/components/imageService.js": {
+    "mtime": 1793017043.3343518,
+    "seen": 1793021966.2886488,
+    "ast_hash": "63c2dec9ff3f0f92cde83414a6d64913",
+    "semantic_hash": "63c2dec9ff3f0f92cde83414a6d64913"
+  },
+  "src/components/selectComplications.js": {
+    "mtime": 1792944012.9364488,
+    "seen": 1793021966.288652,
+    "ast_hash": "f316dc7670f59c0bdfb9d84acf63b094",
+    "semantic_hash": "f316dc7670f59c0bdfb9d84acf63b094"
+  },
+  "src/components/supabaseClient.js": {
+    "mtime": 1763834814.9743004,
+    "seen": 1792680031.873217,
+    "ast_hash": "2d83c0705345d2c1ff061609206e1d3a",
+    "semantic_hash": "2d83c0705345d2c1ff061609206e1d3a"
+  },
+  "src/components/validation.js": {
+    "mtime": 1792799706.3667512,
+    "seen": 1793021966.288683,
+    "ast_hash": "f189332a234c85dc884d5d3930e8114f",
+    "semantic_hash": "f189332a234c85dc884d5d3930e8114f"
+  },
+  "src/components/watchService.js": {
+    "mtime": 1793022089.925354,
+    "seen": 1793022206.831233,
+    "ast_hash": "1ab2d5c7263248099f7cb2598466ef87",
+    "semantic_hash": "1ab2d5c7263248099f7cb2598466ef87"
+  },
+  "src/main.jsx": {
+    "mtime": 1761836639.4778938,
+    "seen": 1792680031.873219,
+    "ast_hash": "e13723e2574429d9a6d849727e3ff695",
+    "semantic_hash": "e13723e2574429d9a6d849727e3ff695"
+  },
+  "vite.config.js": {
+    "mtime": 1747079840.9388664,
+    "seen": 1792680031.8732202,
+    "ast_hash": "60f45fb0d096cd17cedb7f802ca68c11",
+    "semantic_hash": "60f45fb0d096cd17cedb7f802ca68c11"
+  },
+  "public/w7-optimized.mp4": {
+    "mtime": 1792680406.8780482,
+    "seen": 1793021966.288735,
+    "ast_hash": "7aeebbb00c9c27d94db86e6a3d25e8cf",
+    "semantic_hash": "7aeebbb00c9c27d94db86e6a3d25e8cf"
+  },
+  "public/w7.webm": {
+    "mtime": 1792944012.9269962,
+    "seen": 1793021966.288736,
+    "ast_hash": "cd04bc91b1cbd97f1a88c206381e1a40",
+    "semantic_hash": "cd04bc91b1cbd97f1a88c206381e1a40"
+  },
+  "public/manifest.json": {
+    "mtime": 1792748179.29187,
+    "seen": 1793021966.288218,
+    "ast_hash": "19d8ce539e99007d9e601fb634abd6e8",
+    "semantic_hash": "19d8ce539e99007d9e601fb634abd6e8"
+  },
+  "scripts/migrate-watch-photos.mjs": {
+    "mtime": 1792944012.9280586,
+    "seen": 1793021966.288218,
+    "ast_hash": "33196e0dca6a4561d0d03432a787e501",
+    "semantic_hash": "33196e0dca6a4561d0d03432a787e501"
+  },
+  "src/components/CollectionQuickStats.jsx": {
+    "mtime": 1793017043.331711,
+    "seen": 1793021966.288306,
+    "ast_hash": "af87eecac04bbb14df1abfc5726a127a",
+    "semantic_hash": "af87eecac04bbb14df1abfc5726a127a"
+  },
+  "src/components/ExternalImageProcessingNotice.jsx": {
+    "mtime": 1792944012.9316506,
+    "seen": 1793021966.2883358,
+    "ast_hash": "72d319ac7c7edb958bc3595844e0b230",
+    "semantic_hash": "72d319ac7c7edb958bc3595844e0b230"
+  },
+  "src/components/MaintenanceLog.jsx": {
+    "mtime": 1792715231.9915981,
+    "seen": 1793021966.288516,
+    "ast_hash": "053d1dae857ebef85707ef028beb5cf3",
+    "semantic_hash": "053d1dae857ebef85707ef028beb5cf3"
+  },
+  "src/components/MaintenanceReminderBanner.jsx": {
+    "mtime": 1792799706.3633962,
+    "seen": 1793021966.2885172,
+    "ast_hash": "2ce55b781363e8de0bf0f0208d447d74",
+    "semantic_hash": "2ce55b781363e8de0bf0f0208d447d74"
+  },
+  "src/components/NotificationSettings.jsx": {
+    "mtime": 1793017043.332807,
+    "seen": 1793021966.288548,
+    "ast_hash": "04ab8abb1bc63e5d5a9da48f79f8e544",
+    "semantic_hash": "04ab8abb1bc63e5d5a9da48f79f8e544"
+  },
+  "src/components/WatchOccasionSelector.jsx": {
+    "mtime": 1792747417.815336,
+    "seen": 1793021966.2886138,
+    "ast_hash": "a3128edab0ee69ba57279e93b4251424",
+    "semantic_hash": "a3128edab0ee69ba57279e93b4251424"
+  },
+  "src/components/backupService.js": {
+    "mtime": 1792944012.9358737,
+    "seen": 1793021966.288615,
+    "ast_hash": "34f9590cb6f8734c2132d18fede58b38",
+    "semantic_hash": "34f9590cb6f8734c2132d18fede58b38"
+  },
+  "src/components/notificationPreferences.js": {
+    "mtime": 1792799706.3665142,
+    "seen": 1793021966.28865,
+    "ast_hash": "bf7bf3e455033ad3357469bf478cf1eb",
+    "semantic_hash": "bf7bf3e455033ad3357469bf478cf1eb"
+  },
+  "src/components/outfitPreferences.js": {
+    "mtime": 1792715231.9930496,
+    "seen": 1793021966.288651,
+    "ast_hash": "6ca86fdada14ddf0d785edf2c731c8a3",
+    "semantic_hash": "6ca86fdada14ddf0d785edf2c731c8a3"
+  },
+  "src/components/useWatchThumbnail.js": {
+    "mtime": 1793017043.3345878,
+    "seen": 1793021966.288682,
+    "ast_hash": "af42065450b7832066a03e042c0e5ef0",
+    "semantic_hash": "af42065450b7832066a03e042c0e5ef0"
+  },
+  "vercel.json": {
+    "mtime": 1792715231.9938192,
+    "seen": 1793021966.2887092,
+    "ast_hash": "800006b8d263823c7d7fabd754799037",
+    "semantic_hash": "800006b8d263823c7d7fabd754799037"
+  },
+  "src/components/outfitService.js": {
+    "mtime": 1793022126.5362043,
+    "seen": 1793022206.8311198,
+    "ast_hash": "0d567600e81a612f4b85a5e1e6b31c6c",
+    "semantic_hash": "0d567600e81a612f4b85a5e1e6b31c6c"
+  },
+  "src/components/useWatchCollection.js": {
+    "mtime": 1793022089.9205961,
+    "seen": 1793022206.8311749,
+    "ast_hash": "eab8e77fb5be65d058b06be345782c8d",
+    "semantic_hash": "eab8e77fb5be65d058b06be345782c8d"
+  }
+}

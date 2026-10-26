@@ -1,47 +1,59 @@
 {
   "communities": {
     "0": [
-      "ref_framer_motion",
-      "ref_mui_material",
-      "ref_react",
+      "ref_browser_image_compression",
+      "ref_lucide_react",
       "ref_react_dom",
-      "ref_react_icons",
-      "ref_swiper",
       "src_app",
       "src_app_app",
-      "src_app_app_getoutfitembedding",
-      "src_components_authform",
-      "src_components_authform_authform",
-      "src_components_clock",
-      "src_components_clock_clock",
-      "src_components_clock_clock_clock",
-      "src_components_clock_getclockposition",
-      "src_components_clock_romannumerals",
-      "src_components_componentcss_authform",
-      "src_components_componentcss_glasssurface",
-      "src_components_darkmodeswitch",
-      "src_components_darkmodeswitch_darkmodeswitch",
-      "src_components_darkmodeswitch_materialuiswitch",
-      "src_components_daywatchmodal",
-      "src_components_daywatchmodal_daywatchmodal",
-      "src_components_dock",
-      "src_components_dock_dock",
-      "src_components_favoritebutton",
-      "src_components_favoritebutton_favoritebutton",
-      "src_components_functionssection",
-      "src_components_functionssection_functionssection",
-      "src_components_glasssurface",
-      "src_components_glasssurface_glasssurface",
-      "src_components_infowatchmodal",
-      "src_components_infowatchmodal_infowatchmodal",
-      "src_components_outfitmodal",
-      "src_components_outfitmodal_outfitmodal",
-      "src_components_userprofile",
-      "src_components_userprofile_userprofile",
-      "src_components_watchdetails",
-      "src_components_watchdetails_watchdetails",
-      "src_components_watchlist",
-      "src_components_watchlist_watchlist",
+      "src_app_floatinglines",
+      "src_app_infinitegridmodal",
+      "src_app_statsmodal",
+      "src_components_backupservice",
+      "src_components_backupservice_createfullbackup",
+      "src_components_backupservice_downloadfullbackup",
+      "src_components_backupservice_imagetoblob",
+      "src_components_backupservice_maintenance_fields",
+      "src_components_backupservice_outfit_color_values",
+      "src_components_backupservice_outfit_occasion_values",
+      "src_components_backupservice_parsebackupfile",
+      "src_components_backupservice_readimageasdataurl",
+      "src_components_backupservice_restorefullbackup",
+      "src_components_backupservice_toplainobject",
+      "src_components_backupservice_watch_fields",
+      "src_components_backupservice_watch_occasion_values",
+      "src_components_collectionquickstats",
+      "src_components_collectionquickstats_collectionquickstats",
+      "src_components_imageservice",
+      "src_components_imageservice_getstorageobject",
+      "src_components_imageservice_getwatchimageurl",
+      "src_components_imageservice_getwatchimageurls",
+      "src_components_imageservice_getwatchthumbnailurl",
+      "src_components_imageservice_makeprivateobjectpath",
+      "src_components_imageservice_private_watch_photo_bucket",
+      "src_components_imageservice_removewatchimage",
+      "src_components_imageservice_uploadwatchimage",
+      "src_components_imageservice_uploadwatchimageblob",
+      "src_components_imageservice_watch_thumbnail_transform",
+      "src_components_notificationpreferences",
+      "src_components_notificationpreferences_default_notification_preferences",
+      "src_components_notificationpreferences_normalizenotificationpreferences",
+      "src_components_notificationpreferences_notification_preferences_saved_event",
+      "src_components_notificationpreferences_reminder_day_options",
+      "src_components_notificationsettings",
+      "src_components_notificationsettings_notificationsettings",
+      "src_components_outfitservice",
+      "src_components_outfitservice_getoptimizedoutfitembedding",
+      "src_components_outfitservice_getoutfitembedding",
+      "src_components_supabaseclient",
+      "src_components_supabaseclient_supabase",
+      "src_components_usewatchcollection",
+      "src_components_usewatchcollection_usewatchcollection",
+      "src_components_validation",
+      "src_components_validation_isvalidwatch",
+      "src_components_watchservice",
+      "src_components_watchservice_addwatchservice",
+      "src_components_watchservice_getuserwatches",
       "src_index",
       "src_main"
     ],
@@ -60,6 +72,25 @@
       "src_components_infinitemenu_createprogram",
       "src_components_infinitemenu_createshader",
       "src_components_infinitemenu_defaultitems",
+      "src_components_infinitemenu_discgeometry",
+      "src_components_infinitemenu_discgeometry_constructor",
+      "src_components_infinitemenu_face",
+      "src_components_infinitemenu_face_constructor",
+      "src_components_infinitemenu_geometry",
+      "src_components_infinitemenu_geometry_addface",
+      "src_components_infinitemenu_geometry_addvertex",
+      "src_components_infinitemenu_geometry_constructor",
+      "src_components_infinitemenu_geometry_data",
+      "src_components_infinitemenu_geometry_getmidpoint",
+      "src_components_infinitemenu_geometry_indexdata",
+      "src_components_infinitemenu_geometry_lastvertex",
+      "src_components_infinitemenu_geometry_normaldata",
+      "src_components_infinitemenu_geometry_spherize",
+      "src_components_infinitemenu_geometry_subdivide",
+      "src_components_infinitemenu_geometry_uvdata",
+      "src_components_infinitemenu_geometry_vertexdata",
+      "src_components_infinitemenu_icosahedrongeometry",
+      "src_components_infinitemenu_icosahedrongeometry_constructor",
       "src_components_infinitemenu_infinitegridmenu",
       "src_components_infinitemenu_infinitegridmenu_animate",
       "src_components_infinitemenu_infinitegridmenu_constructor",
@@ -78,16 +109,25 @@
       "src_components_infinitemenu_infinitemenu",
       "src_components_infinitemenu_makebuffer",
       "src_components_infinitemenu_makevertexarray",
-      "src_components_infinitemenu_resizecanvastodisplaysize"
+      "src_components_infinitemenu_resizecanvastodisplaysize",
+      "src_components_infinitemenu_vertex",
+      "src_components_infinitemenu_vertex_constructor"
     ],
     "2": [
       "eslint_config",
       "package",
       "package_name",
       "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_deploy",
+      "package_scripts_dev",
+      "package_scripts_lint",
+      "package_scripts_migrate_watch_photos",
+      "package_scripts_preview",
+      "package_scripts_start",
       "package_type",
       "package_version",
-      "ref_browser_image_compression",
       "ref_capacitor_cli",
       "ref_capacitor_core",
       "ref_capacitor_ios",
@@ -100,9 +140,8 @@
       "ref_eslint_plugin_react_refresh",
       "ref_gh_pages",
       "ref_globals",
-      "ref_lucide_react",
       "ref_md5",
-      "ref_react_avatar",
+      "ref_mui_material",
       "ref_react_color",
       "ref_react_router_dom",
       "ref_react_select",
@@ -111,9 +150,87 @@
       "ref_vercel_speed_insights",
       "ref_vite",
       "ref_vitejs_plugin_react",
+      "src_components_darkmodeswitch",
+      "src_components_darkmodeswitch_darkmodeswitch",
+      "src_components_darkmodeswitch_materialuiswitch",
       "vite_config"
     ],
     "3": [
+      "ref_react",
+      "ref_react_avatar",
+      "ref_react_icons",
+      "src_components_authform",
+      "src_components_authform_authform",
+      "src_components_clock",
+      "src_components_clock_clock",
+      "src_components_clock_clock_clock",
+      "src_components_clock_getclockposition",
+      "src_components_clock_romannumerals",
+      "src_components_componentcss_authform",
+      "src_components_componentcss_electricborder",
+      "src_components_componentcss_glasssurface",
+      "src_components_daywatchmodal",
+      "src_components_daywatchmodal_daywatchmodal",
+      "src_components_dock",
+      "src_components_dock_dock",
+      "src_components_electricborder",
+      "src_components_electricborder_electricborder",
+      "src_components_favoritebutton",
+      "src_components_favoritebutton_favoritebutton",
+      "src_components_glasssurface",
+      "src_components_glasssurface_glasssurface",
+      "src_components_infowatchmodal",
+      "src_components_infowatchmodal_infowatchmodal",
+      "src_components_maintenancelog",
+      "src_components_maintenancelog_emptyform",
+      "src_components_maintenancelog_formatdate",
+      "src_components_maintenancelog_localtoday",
+      "src_components_maintenancelog_maintenancelog",
+      "src_components_scrollingbrands",
+      "src_components_scrollingbrands_scrollingbrands1",
+      "src_components_scrollingbrands_scrollingbrands2",
+      "src_components_scrollingbrands_scrollingbrands3",
+      "src_components_userprofile",
+      "src_components_userprofile_userprofile",
+      "src_components_watchdetails",
+      "src_components_watchdetails_watchdetails"
+    ],
+    "4": [
+      "ref_swiper",
+      "src_components_addwatchform",
+      "src_components_addwatchform_addwatchform",
+      "src_components_componentcss_stepper",
+      "src_components_externalimageprocessingnotice",
+      "src_components_externalimageprocessingnotice_externalimageprocessingnotice",
+      "src_components_featurecheckboxlist",
+      "src_components_featurecheckboxlist_featurecheckboxlist",
+      "src_components_functionssection",
+      "src_components_functionssection_functionssection",
+      "src_components_modifywatchmodal",
+      "src_components_modifywatchmodal_modifywatchmodal",
+      "src_components_outfitmodal",
+      "src_components_outfitmodal_outfitmodal",
+      "src_components_outfitpreferences",
+      "src_components_outfitpreferences_color_label_by_value",
+      "src_components_outfitpreferences_getoutfitmatchexplanation",
+      "src_components_outfitpreferences_getwatchcolorfamily",
+      "src_components_outfitpreferences_matchesoutfitfilters",
+      "src_components_outfitpreferences_occasion_label_by_value",
+      "src_components_outfitpreferences_outfit_color_families",
+      "src_components_outfitpreferences_outfit_occasions",
+      "src_components_stepper",
+      "src_components_stepper_checkicon",
+      "src_components_stepper_slidetransition",
+      "src_components_stepper_step",
+      "src_components_stepper_stepconnector",
+      "src_components_stepper_stepcontentwrapper",
+      "src_components_stepper_stepindicator",
+      "src_components_stepper_stepper",
+      "src_components_stepper_stepvariants",
+      "src_components_watchoccasionselector",
+      "src_components_watchoccasionselector_watchoccasionselector"
+    ],
+    "5": [
       "package_dependencies",
       "package_dependencies_browser_image_compression",
       "package_dependencies_capacitor_cli",
@@ -144,30 +261,34 @@
       "package_dependencies_three",
       "package_dependencies_vercel_speed_insights"
     ],
-    "4": [
-      "src_components_infinitemenu_discgeometry",
-      "src_components_infinitemenu_discgeometry_constructor",
-      "src_components_infinitemenu_face",
-      "src_components_infinitemenu_face_constructor",
-      "src_components_infinitemenu_geometry",
-      "src_components_infinitemenu_geometry_addface",
-      "src_components_infinitemenu_geometry_addvertex",
-      "src_components_infinitemenu_geometry_constructor",
-      "src_components_infinitemenu_geometry_data",
-      "src_components_infinitemenu_geometry_getmidpoint",
-      "src_components_infinitemenu_geometry_indexdata",
-      "src_components_infinitemenu_geometry_lastvertex",
-      "src_components_infinitemenu_geometry_normaldata",
-      "src_components_infinitemenu_geometry_spherize",
-      "src_components_infinitemenu_geometry_subdivide",
-      "src_components_infinitemenu_geometry_uvdata",
-      "src_components_infinitemenu_geometry_vertexdata",
-      "src_components_infinitemenu_icosahedrongeometry",
-      "src_components_infinitemenu_icosahedrongeometry_constructor",
-      "src_components_infinitemenu_vertex",
-      "src_components_infinitemenu_vertex_constructor"
+    "6": [
+      "ref_framer_motion",
+      "ref_motion",
+      "src_components_componentcss_tiltedcard",
+      "src_components_maintenancereminderbanner",
+      "src_components_maintenancereminderbanner_addyears",
+      "src_components_maintenancereminderbanner_daysfromtoday",
+      "src_components_maintenancereminderbanner_formatdate",
+      "src_components_maintenancereminderbanner_getduedate",
+      "src_components_maintenancereminderbanner_maintenancereminderbanner",
+      "src_components_maintenancereminderbanner_parsedate",
+      "src_components_maintenancereminderbanner_todatekey",
+      "src_components_tiltedcard",
+      "src_components_tiltedcard_springvalues",
+      "src_components_tiltedcard_tiltedcard",
+      "src_components_tiltedcard_tiltedcard_handlemouse",
+      "src_components_tiltedcard_tiltedcard_handlemouseenter",
+      "src_components_tiltedcard_tiltedcard_handlemouseleave",
+      "src_components_usewatchthumbnail",
+      "src_components_usewatchthumbnail_usewatchthumbnail",
+      "src_components_watchlist",
+      "src_components_watchlist_csvcell",
+      "src_components_watchlist_getwatchfeatures",
+      "src_components_watchlist_readsavedviewmode",
+      "src_components_watchlist_watchcarouselimage",
+      "src_components_watchlist_watchlist"
     ],
-    "5": [
+    "7": [
       "any",
       "bool",
       "capacitor",
@@ -189,7 +310,7 @@
       "url",
       "void"
     ],
-    "6": [
+    "8": [
       "ref_ogl",
       "src_components_componentcss_iridescence",
       "src_components_componentcss_metaballs",
@@ -210,40 +331,23 @@
       "src_components_metaballs_metaballs_update",
       "src_components_metaballs_parsehexcolor"
     ],
-    "7": [
-      "src_components_addwatchform",
-      "src_components_addwatchform_addwatchform",
-      "src_components_componentcss_stepper",
-      "src_components_featurecheckboxlist",
-      "src_components_featurecheckboxlist_featurecheckboxlist",
-      "src_components_modifywatchmodal",
-      "src_components_modifywatchmodal_modifywatchmodal",
-      "src_components_stepper",
-      "src_components_stepper_checkicon",
-      "src_components_stepper_slidetransition",
-      "src_components_stepper_step",
-      "src_components_stepper_stepconnector",
-      "src_components_stepper_stepcontentwrapper",
-      "src_components_stepper_stepindicator",
-      "src_components_stepper_stepper",
-      "src_components_stepper_stepvariants"
-    ],
-    "8": [
-      "ref_motion",
-      "src_components_circulartext",
-      "src_components_circulartext_circulartext",
-      "src_components_circulartext_getrotationtransition",
-      "src_components_circulartext_gettransition",
-      "src_components_componentcss_circulartext",
-      "src_components_componentcss_tiltedcard",
-      "src_components_tiltedcard",
-      "src_components_tiltedcard_springvalues",
-      "src_components_tiltedcard_tiltedcard",
-      "src_components_tiltedcard_tiltedcard_handlemouse",
-      "src_components_tiltedcard_tiltedcard_handlemouseenter",
-      "src_components_tiltedcard_tiltedcard_handlemouseleave"
-    ],
     "9": [
+      "ref_chart_js",
+      "ref_react_chartjs_2",
+      "src_components_statsmodal",
+      "src_components_statsmodal_statsmodal",
+      "src_components_watchanalytics",
+      "src_components_watchanalytics_asnumber",
+      "src_components_watchanalytics_chart_colors",
+      "src_components_watchanalytics_formateuro",
+      "src_components_watchanalytics_makeconditiondata",
+      "src_components_watchanalytics_makecountdata",
+      "src_components_watchanalytics_makedecadedata",
+      "src_components_watchanalytics_makepurchasedata",
+      "src_components_watchanalytics_statcard",
+      "src_components_watchanalytics_watchanalytics"
+    ],
+    "10": [
       "package_devdependencies",
       "package_devdependencies_eslint",
       "package_devdependencies_eslint_js",
@@ -256,7 +360,32 @@
       "package_devdependencies_vite",
       "package_devdependencies_vitejs_plugin_react"
     ],
-    "10": [
+    "11": [
+      "ref_node_crypto",
+      "ref_supabase_supabase_js",
+      "scripts_migrate_watch_photos",
+      "scripts_migrate_watch_photos_cleanupfailures",
+      "scripts_migrate_watch_photos_extensionfor",
+      "scripts_migrate_watch_photos_getlegacypath",
+      "scripts_migrate_watch_photos_listfolder",
+      "scripts_migrate_watch_photos_listuserobjects",
+      "scripts_migrate_watch_photos_loadwatches",
+      "scripts_migrate_watch_photos_referencedlegacypaths",
+      "scripts_migrate_watch_photos_supabase"
+    ],
+    "12": [
+      "public_manifest",
+      "public_manifest_background_color",
+      "public_manifest_display",
+      "public_manifest_icons",
+      "public_manifest_id",
+      "public_manifest_name",
+      "public_manifest_scope",
+      "public_manifest_short_name",
+      "public_manifest_start_url",
+      "public_manifest_theme_color"
+    ],
+    "13": [
       "ref_react_three_fiber",
       "ref_three",
       "src_components_componentcss_floatinglines",
@@ -267,37 +396,6 @@
       "src_components_plasma_hextonormalizedrgb",
       "src_components_plasma_silk",
       "src_components_plasma_silkplane"
-    ],
-    "11": [
-      "ref_supabase_supabase_js",
-      "src_components_imageservice",
-      "src_components_imageservice_uploadimage",
-      "src_components_supabaseclient",
-      "src_components_supabaseclient_supabase",
-      "src_components_validation",
-      "src_components_validation_isvalidwatch",
-      "src_components_watchservice",
-      "src_components_watchservice_addwatchservice"
-    ],
-    "12": [
-      "manifest",
-      "manifest_background_color",
-      "manifest_display",
-      "manifest_icons",
-      "manifest_name",
-      "manifest_short_name",
-      "manifest_start_url",
-      "manifest_theme_color"
-    ],
-    "13": [
-      "ref_chart_js",
-      "ref_react_chartjs_2",
-      "src_components_statsmodal",
-      "src_components_statsmodal_statsmodal",
-      "src_components_watchanalytics",
-      "src_components_watchanalytics_generatecolors",
-      "src_components_watchanalytics_processdata",
-      "src_components_watchanalytics_watchanalytics"
     ],
     "14": [
       "src_components_componentcss_logoloop",
@@ -310,13 +408,11 @@
       "src_components_logoloop_useresizeobserver"
     ],
     "15": [
-      "package_scripts",
-      "package_scripts_build",
-      "package_scripts_deploy",
-      "package_scripts_dev",
-      "package_scripts_lint",
-      "package_scripts_preview",
-      "package_scripts_start"
+      "src_components_circulartext",
+      "src_components_circulartext_circulartext",
+      "src_components_circulartext_getrotationtransition",
+      "src_components_circulartext_gettransition",
+      "src_components_componentcss_circulartext"
     ],
     "16": [
       "src_components_watchmovementcomplication",
@@ -326,67 +422,62 @@
       "src_components_watchmovementcomplication_watchmovementcomplication"
     ],
     "17": [
-      "src_components_scrollingbrands",
-      "src_components_scrollingbrands_scrollingbrands1",
-      "src_components_scrollingbrands_scrollingbrands2",
-      "src_components_scrollingbrands_scrollingbrands3"
+      "vercel",
+      "vercel_buildcommand",
+      "vercel_outputdirectory",
+      "vercel_redirects",
+      "vercel_rewrites"
     ],
     "18": [
-      "src_components_componentcss_electricborder",
-      "src_components_electricborder",
-      "src_components_electricborder_electricborder"
+      "src_components_selectcomplications",
+      "src_components_selectcomplications_featuresdropdown",
+      "src_components_selectcomplications_featureslist"
     ],
     "19": [
-      "src_components_selectcomplications",
-      "src_components_selectcomplications_featureslist",
-      "src_components_selectcomplications_watchdetails"
-    ],
-    "20": [
       "backup_uploadimage_restore",
       "backup_uploadimage_restore_uploadimage"
     ],
-    "21": [
+    "20": [
       "backup_addwatch_restore"
     ],
-    "22": [
+    "21": [
       "src_components_componentcss_dsd"
     ]
   },
   "cohesion": {
-    "0": 0.10963455149501661,
-    "1": 0.11553030303030302,
-    "2": 0.07311827956989247,
-    "3": 0.06896551724137931,
-    "4": 0.12857142857142856,
-    "5": 0.12631578947368421,
-    "6": 0.13450292397660818,
-    "7": 0.23333333333333334,
-    "8": 0.1794871794871795,
-    "9": 0.18181818181818182,
-    "10": 0.26666666666666666,
-    "11": 0.4166666666666667,
-    "12": 0.25,
-    "13": 0.39285714285714285,
+    "0": 0.0936026936026936,
+    "1": 0.06708595387840671,
+    "2": 0.05641025641025641,
+    "3": 0.08108108108108109,
+    "4": 0.12878787878787878,
+    "5": 0.06896551724137931,
+    "6": 0.15333333333333332,
+    "7": 0.12631578947368421,
+    "8": 0.13450292397660818,
+    "9": 0.27472527472527475,
+    "10": 0.18181818181818182,
+    "11": 0.2,
+    "12": 0.2,
+    "13": 0.26666666666666666,
     "14": 0.39285714285714285,
-    "15": 0.2857142857142857,
+    "15": 0.6,
     "16": 0.7,
-    "17": 0.5,
+    "17": 0.4,
     "18": 0.6666666666666666,
-    "19": 0.6666666666666666,
+    "19": 1.0,
     "20": 1.0,
-    "21": 1.0,
-    "22": 1.0
+    "21": 1.0
   },
   "gods": [
     {
       "id": "ref_react",
       "label": "react",
-      "degree": 33
+      "degree": 41
     },
     {
       "id": "src_app_app",
       "label": "App()",
-      "degree": 20
+      "degree": 31
     },
     {
       "id": "src_components_infinitemenu_infinitegridmenu",
@@ -399,95 +490,128 @@
       "degree": 15
     },
     {
+      "id": "src_components_imageservice_getwatchimageurl",
+      "label": "getWatchImageUrl()",
+      "degree": 11
+    },
+    {
       "id": "ios_app_app_appdelegate_appdelegate",
       "label": "AppDelegate",
       "degree": 10
     },
     {
-      "id": "src_components_metaballs_metaballs",
-      "label": "MetaBalls()",
+      "id": "src_components_watchanalytics_watchanalytics",
+      "label": "WatchAnalytics()",
+      "degree": 10
+    },
+    {
+      "id": "src_components_notificationpreferences_normalizenotificationpreferences",
+      "label": "normalizeNotificationPreferences()",
       "degree": 9
     },
     {
-      "id": "src_components_glasssurface_glasssurface",
-      "label": "GlassSurface()",
-      "degree": 7
+      "id": "src_components_watchlist_watchlist",
+      "label": "WatchList()",
+      "degree": 9
     },
     {
-      "id": "src_components_infinitemenu_infinitemenu",
-      "label": "InfiniteMenu()",
-      "degree": 7
-    },
-    {
-      "id": "src_components_tiltedcard_tiltedcard",
-      "label": "TiltedCard()",
-      "degree": 7
-    },
-    {
-      "id": "src_components_logoloop_logoloop",
-      "label": "LogoLoop",
-      "degree": 7
+      "id": "src_components_metaballs_metaballs",
+      "label": "MetaBalls()",
+      "degree": 9
     }
   ],
   "surprises": [
     {
-      "source": "Dock()",
-      "target": "react",
+      "source": "App()",
+      "target": "AuthForm()",
       "source_files": [
-        "src/components/Dock.jsx",
-        "package.json"
+        "src/App.jsx",
+        "src/components/AuthForm.jsx"
       ],
       "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "connects across different repos/directories; bridges separate communities"
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `AuthForm()` unexpectedly reaches hub `App()`"
     },
     {
       "source": "App()",
-      "target": "AddWatchForm()",
+      "target": "Dock()",
       "source_files": [
         "src/App.jsx",
-        "src/components/AddWatchForm.jsx"
+        "src/components/Dock.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `Dock()` unexpectedly reaches hub `App()`"
+    },
+    {
+      "source": "App()",
+      "target": "CollectionQuickStats()",
+      "source_files": [
+        "src/App.jsx",
+        "src/components/CollectionQuickStats.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `CollectionQuickStats()` unexpectedly reaches hub `App()`"
+    },
+    {
+      "source": "DayWatchModal()",
+      "target": "getWatchImageUrl()",
+      "source_files": [
+        "src/components/DayWatchModal.jsx",
+        "src/components/imageService.js"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "bridges separate communities"
     },
     {
-      "source": "App()",
-      "target": "FloatingLines()",
+      "source": "useWatchThumbnail()",
+      "target": "getWatchThumbnailUrl()",
       "source_files": [
-        "src/App.jsx",
-        "src/components/FloatingLines.jsx"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "bridges separate communities"
-    },
-    {
-      "source": "App()",
-      "target": "InfiniteGridModal()",
-      "source_files": [
-        "src/App.jsx",
-        "src/components/InfiniteGridModal.jsx"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "bridges separate communities"
-    },
-    {
-      "source": "App()",
-      "target": "LogoLoop",
-      "source_files": [
-        "src/App.jsx",
-        "src/components/LogoLoop.jsx"
+        "src/components/useWatchThumbnail.js",
+        "src/components/imageService.js"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "bridges separate communities"
     }
   ],
-  "tokens": {
-    "input": 0,
-    "output": 0
-  }
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `react` connect `package.json` to `App.jsx`, `InfiniteMenu.jsx`, `react`, `WatchList.jsx`, `AppDelegate`, `WatchAnalytics.jsx`, `devDependencies`, `FloatingLines.jsx`, `scripts`, `Clock.jsx`?",
+      "why": "High betweenness centrality (0.420) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `@capacitor/cli`, `@capacitor/core`, `@capacitor/ios` to the rest of the system?",
+      "why": "16 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `App.jsx` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.0936026936026936 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `dependencies` connect `dependencies` to `react`?",
+      "why": "High betweenness centrality (0.119) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `InfiniteMenu.jsx` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06708595387840671 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `@supabase/supabase-js` connect `InfoWatchModal.jsx` to `App.jsx`, `react`?",
+      "why": "High betweenness centrality (0.046) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `react` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05641025641025641 - nodes in this community are weakly interconnected."
+    }
+  ]
 }

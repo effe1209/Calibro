@@ -8123,6 +8123,49 @@ a:focus-visible,
   display: none;
 }
 
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 18px;
+  background: var(--ui-surface-strong);
+  color: var(--ui-text);
+  box-shadow: var(--ui-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
+  text-align: left;
+}
+
+.message > button {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ui-muted);
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.message > button:hover {
+  background: var(--ui-accent-soft);
+  color: var(--ui-text);
+}
+
+.message > button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ui-accent) 50%, white);
+  outline-offset: 2px;
+}
+
 .collection-export-menu__chevron {
   margin-left: 1px;
   font-size: 1.05em;

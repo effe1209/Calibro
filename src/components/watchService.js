@@ -4,10 +4,48 @@
 import { supabase } from './supabaseClient';
 import {
   getWatchImageUrl,
+  getWatchImageUrls,
   removeWatchImage,
   uploadWatchImage,
 } from './imageService';
 import { isValidWatch } from './validation';
+
+export const getUserWatches = async (userId) => {
+  const [
+    { data, error },
+    { data: watchesWithoutEmbeddings, error: embeddingsError },
+  ] = await Promise.all([
+    supabase
+      .from('watches')
+      .select('id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, created_at, Orologi_Caratteristiche(*, caratteristiche(*))')
+      .eq('userid', userId),
+    supabase
+      .from('watches')
+      .select('id')
+      .eq('userid', userId)
+      .not('image', 'is', null)
+      .neq('image', '')
+      .is('embedding', null),
+  ]);
+
+  if (error) throw error;
+  if (embeddingsError) throw embeddingsError;
+
+  const watchRows = data || [];
+  const imageUrls = await getWatchImageUrls(watchRows.map((watch) => watch.image));
+  const watches = watchRows.map((watch, index) => ({
+    ...watch,
+    caratteristiche: (watch.Orologi_Caratteristiche || [])
+      .map((joinEntry) => joinEntry?.caratteristiche)
+      .filter(Boolean),
+    imageUrl: imageUrls[index],
+  }));
+
+  return {
+    watches,
+    missingOutfitEmbeddingIds: (watchesWithoutEmbeddings || []).map((watch) => watch.id),
+  };
+};
 
 // 2. La firma della funzione non cambia
 export const addWatchService = async (options) => {

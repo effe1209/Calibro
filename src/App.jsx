@@ -1,16 +1,17 @@
 import React, { lazy, Suspense, useState, useEffect, useRef, useTransition, useMemo, useCallback } from "react";
 import { createPortal } from 'react-dom';
 import imageCompression from 'browser-image-compression';
+import { getOptimizedOutfitEmbedding, getOutfitEmbedding } from './components/outfitService';
 // Import Supabase e servizi (invariati)
 import { supabase } from './components/supabaseClient';
 import { addWatchService } from './components/watchService';
 import {
   getWatchImageUrl,
-  getWatchImageUrls,
   removeWatchImage,
   uploadWatchImage,
 } from './components/imageService';
 import { downloadFullBackup, parseBackupFile, restoreFullBackup } from './components/backupService';
+import { useWatchCollection } from './components/useWatchCollection';
 import AuthForm from './components/AuthForm';
 import GlassSurface from './components/GlassSurface';
 import TiltedCard from './components/TiltedCard';
@@ -53,7 +54,6 @@ function App() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWatch, setSelectedWatch] = useState(null);
   const modifyBackHandlerRef = useRef(null);
-  const watchFetchRequestRef = useRef(0);
   const fileInputRef = useRef(null);
   const fileInputRefOutfit = useRef(null);
   const backupInputRef = useRef(null);
@@ -62,8 +62,15 @@ function App() {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
-  const [watches, setWatches] = useState([]);
-  const [missingOutfitEmbeddingIds, setMissingOutfitEmbeddingIds] = useState([]);
+  const {
+    watches,
+    setWatches,
+    missingOutfitEmbeddingIds,
+    setMissingOutfitEmbeddingIds,
+    fetchWatches,
+    invalidateRequests: invalidateWatchRequests,
+    clearCollection,
+  } = useWatchCollection(setMessage);
   const missingOutfitEmbeddingCount = missingOutfitEmbeddingIds.length;
   const [maintenanceRefreshKey, setMaintenanceRefreshKey] = useState(0);
   const [watchConsigliati, setWatchConsigliati] = useState([]);
@@ -301,7 +308,7 @@ function App() {
 
     const savedNickname = localStorage.getItem('nickname');
     if (savedNickname) setNickname(savedNickname);
-  }, []);
+  }, [fetchWatches]);
 
   // Salva nickname
   useEffect(() => {
@@ -433,10 +440,8 @@ function App() {
     try {
       const { error } = await supabase.auth.signOut({ scope: 'local' });
       if (error) throw error;
-      watchFetchRequestRef.current += 1;
+      clearCollection();
       setUser(null);
-      setWatches([]);
-      setMissingOutfitEmbeddingIds([]);
       setEmail('');
       setPassword('');
       setNickname('');
@@ -523,7 +528,7 @@ const handleAddWatch = async () => {
     try {
       const { error } = await supabase.from("watches").delete().eq("id", id);
       if (error) throw error;
-      watchFetchRequestRef.current += 1;
+      invalidateWatchRequests();
       setWatches(prevWatches => prevWatches.filter(watch => watch.id !== id));
       setMissingOutfitEmbeddingIds((currentIds) => (
         currentIds.filter((missingId) => String(missingId) !== String(id))
@@ -546,54 +551,6 @@ const handleAddWatch = async () => {
       return false;
     }
   };
-
-const fetchWatches = async (userid) => {
-  const requestId = ++watchFetchRequestRef.current;
-  try {
-    const [
-      { data, error },
-      { data: watchesWithoutEmbeddings, error: embeddingsError },
-    ] = await Promise.all([
-      supabase
-        .from("watches")
-        .select("id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, created_at, Orologi_Caratteristiche(*, caratteristiche(*))")
-        .eq("userid", userid),
-      supabase
-        .from("watches")
-        .select("id")
-        .eq("userid", userid)
-        .not("image", "is", null)
-        .neq("image", "")
-        .is("embedding", null),
-    ]);
-    if (error) throw error;
-    if (embeddingsError) throw embeddingsError;
-    if (requestId !== watchFetchRequestRef.current) return false;
-
-    const watchRows = data || [];
-    const imageUrls = await getWatchImageUrls(watchRows.map((watch) => watch.image));
-    if (requestId !== watchFetchRequestRef.current) return false;
-
-    const userWatches = watchRows.map((watch, index) => {
-      const features = (watch.Orologi_Caratteristiche || [])
-        .map((joinEntry) => joinEntry?.caratteristiche)
-        .filter(Boolean);
-      return {
-        ...watch,
-        caratteristiche: features,
-        imageUrl: imageUrls[index],
-      };
-    });
-    setWatches(userWatches);
-    setMissingOutfitEmbeddingIds((watchesWithoutEmbeddings || []).map((watch) => watch.id));
-    return true;
-  } catch (error) {
-    if (requestId === watchFetchRequestRef.current) {
-      setMessage("Errore durante il recupero degli orologi: " + error.message);
-    }
-    return false;
-  }
-};
 
   const handleCreateBackup = async () => {
     if (!user || isBackupBusy) return;
@@ -922,58 +879,6 @@ const handleFavoriteToggle = async (watchId) => {
     }
   };
 
-// Modifica questa funzione in App.jsx
-async function getOutfitEmbedding(fileOrBlob) {
-  const formData = new FormData();
-  
-  // TRUCCO: Se è un Blob (e non un File da input), aggiungiamo manualmente un nome file.
-  // Senza questo, il server Python riceve un file senza nome e può rifiutarlo.
-  if (fileOrBlob instanceof Blob && !fileOrBlob.name) {
-      formData.append('file', fileOrBlob, 'image_from_db.jpg');
-  } else {
-      formData.append('file', fileOrBlob);
-  }
-
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 45000);
-
-  try {
-    const response = await fetch('https://effe02-chroneapp-server.hf.space/embed-image', {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      throw new Error('Il servizio di analisi non è disponibile. Riprova tra poco.');
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data.vector) || data.vector.length === 0) {
-      throw new Error('L’analisi non ha prodotto un risultato. Prova con un’altra foto.');
-    }
-    return data.vector;
-  } catch (error) {
-    console.error("Dettaglio errore AI:", error);
-    if (error.name === 'AbortError') {
-      throw new Error('L’analisi sta impiegando troppo tempo. Riprova con una foto più leggera.');
-    }
-    throw error;
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-}
-
-async function getOptimizedOutfitEmbedding(file) {
-  const optimizedImage = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1280,
-    initialQuality: 0.82,
-    useWebWorker: true,
-  });
-  return getOutfitEmbedding(optimizedImage);
-}
-
 const handleImageUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -1127,8 +1032,8 @@ const handleOutfitFeedback = async (watchId, feedback) => {
 // Aggiungilo in cima ad App.jsx o in un file separato
 const LoadingModal = ({ message }) => {
   return (
-    <div className="loading-overlay">
-      <div className="spinner"></div>
+    <div className="loading-overlay" role="status" aria-live="polite" aria-busy="true">
+      <div className="spinner" aria-hidden="true"></div>
       <div className="loading-text">{message || "Caricamento in corso..."}</div>
       {/* Opzionale: piccolo testo per i tempi di attesa dell'AI */}
       <small style={{marginTop: "10px", opacity: 0.7, fontSize: "0.8rem"}}>
@@ -1542,7 +1447,14 @@ const BackgroundLayer = useMemo(() => {
         )}
       </div>
 
-      {message && <p className="message" onClick={() => setMessage(null)}>{message}</p>}
+      {message && (
+        <div className="message" role="status" aria-live="polite" aria-atomic="true">
+          <span>{message}</span>
+          <button type="button" aria-label="Chiudi notifica" onClick={() => setMessage(null)}>
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+      )}
       {loading && <div className="loading-spinner"></div>} 
       <div style={{ marginBottom: "20px" }}></div>
 
