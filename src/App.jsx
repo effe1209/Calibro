@@ -483,6 +483,7 @@ function App() {
   };
 
 const handleAddWatch = async () => {
+  const imageToEmbed = newWatch.image instanceof File ? newWatch.image : null;
   const stateOptions = {
     newWatch,
     user,
@@ -497,31 +498,47 @@ const handleAddWatch = async () => {
     const added = await addWatchService(stateOptions);
     if (!added) return;
 
+    invalidateWatchRequests();
     void triggerLightImpact();
-    let outfitEmbeddingWarning = false;
-    if (newWatch.image instanceof File && added.id) {
-      setLoading(true);
-      setMessage('Orologio salvato. Lo preparo anche per gli abbinamenti outfit…');
-      try {
-        const embedding = await getOptimizedOutfitEmbedding(newWatch.image);
-        const { error: embeddingError } = await supabase
-          .from('watches')
-          .update({ embedding })
-          .eq('id', added.id);
-        if (embeddingError) throw embeddingError;
-      } catch (error) {
-        console.error('Impossibile preparare l’orologio per gli abbinamenti outfit:', error);
-        outfitEmbeddingWarning = true;
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    setMessage(outfitEmbeddingWarning
-      ? 'Orologio aggiunto. Non è stato possibile includerlo negli abbinamenti outfit: riprova più tardi.'
-      : 'Orologio aggiunto con successo!');
     handleCancel();
-    await fetchWatches(user.id);
+
+    if (imageToEmbed && added.id) {
+      const pendingMessage = 'Orologio aggiunto. Preparo gli abbinamenti outfit in background…';
+      const successMessage = 'Orologio aggiunto con successo!';
+      setMissingOutfitEmbeddingIds((currentIds) => (
+        currentIds.some((id) => String(id) === String(added.id))
+          ? currentIds
+          : [...currentIds, added.id]
+      ));
+      setMessage(pendingMessage);
+
+      void (async () => {
+        try {
+          const embedding = await getOptimizedOutfitEmbedding(imageToEmbed);
+          const { error: embeddingError } = await supabase
+            .from('watches')
+            .update({ embedding })
+            .eq('id', added.id);
+          if (embeddingError) throw embeddingError;
+
+          setMissingOutfitEmbeddingIds((currentIds) => (
+            currentIds.filter((id) => String(id) !== String(added.id))
+          ));
+          setMessage((currentMessage) => (
+            currentMessage === pendingMessage ? successMessage : currentMessage
+          ));
+        } catch (error) {
+          console.error('Impossibile preparare l’orologio per gli abbinamenti outfit:', error);
+          setMessage((currentMessage) => (
+            currentMessage === pendingMessage
+              ? 'Orologio aggiunto. Non è stato possibile includerlo negli abbinamenti outfit: riprova più tardi.'
+              : currentMessage
+          ));
+        }
+      })();
+    } else {
+      setMessage('Orologio aggiunto con successo!');
+    }
   } catch (error) {
     console.error("Errore (da addWatchService):", error);
     setMessage(error.message || "Errore durante l'aggiunta dell'orologio.");
