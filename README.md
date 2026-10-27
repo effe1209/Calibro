@@ -1,138 +1,97 @@
-# ⌚ Calibro - La tua collezione di orologi digitale
+<div align="center">
+  <img src="public/calibro_icon.svg" alt="Calibro Logo" width="120" height="120" />
 
-Calibro è un'applicazione web moderna e responsiva progettata per gli appassionati di orologi che desiderano catalogare, gestire e interagire con la propria collezione personale in modo intuitivo e veloce.
-
----
-
-## Indice
-- [🚀 Funzionalità Principali](#-funzionalità-principali)
-- [🧠 Funzioni Intelligenti e Interattive](#funzioni-intelligenti-e-interattive)
-- [🎧 Interfaccia Utente e Performance](#interfaccia-utente-e-performance)
-- [🛠️ Stack Tecnologico](#️-stack-tecnologico)
-- [📷 Screenshots](#-screenshots)
-- [📈 Contributing](#-contributing)
-- [👤 Contributors](#-contributors)
-- [📍 Roadmap](#-roadmap)
-- [📧 Contatti](#-contatti)
-- [🫶 Ringraziamenti](#-ringraziamenti)
+  <h1>Calibro ⏱️</h1>
+  
+  <p>
+    <strong>Il caveau digitale e intelligente per la tua collezione di orologi.</strong>
+  </p>
+  
+  <p>
+    Una piattaforma web moderna pensata per gli appassionati di orologeria che desiderano catalogare, monitorare e vivere la propria collezione attraverso un'interfaccia elegante e strumenti di analisi visiva avanzati.
+  </p>
+</div>
 
 ---
 
 ## 🚀 Funzionalità Principali
-- Gestione e Visualizzazione della Collezione
-- Registrazione e Accesso Utente: Autenticazione sicura tramite Supabase.
-- Gestione Orologi: Inserimento, modifica ed eliminazione degli orologi dalla collezione.
-- Vista Dinamica: Alternanza tra la visualizzazione a Griglia, con la possibilità di selezionare gli orologi preferiti, e la visualizzazione a Carosello.
-- Organizzazione Avanzata: Ricerca testuale, filtri per marca, preferiti, anno e prezzo, ordinamento e esportazione CSV dei risultati.
-- Scheda completa: Condizione da 1 a 10, prezzo e data di acquisto, valore dichiarato, dotazione, garanzia e informazioni del centro assistenza.
-- Registro revisioni: Storico degli interventi con date, costi, fornitori e prossima scadenza.
-- Promemoria configurabili: Avvisi in app per garanzie e revisioni in scadenza, con anticipo personalizzabile e possibilità di nasconderli.
-- Backup completo: Esportazione e ripristino incrementale di orologi, revisioni, immagini, preferenze outfit e notifiche.
 
-Il backup completo è un file JSON autonomo con le immagini incluse. Il ripristino unisce i dati: aggiorna i record con lo stesso identificativo di backup e lascia inalterati gli altri.
+* **Gestione Completa del Catalogo:** Inserisci, modifica ed elimina i tuoi segnatempo con facilità. Alterna tra una vista a griglia (con selezione rapida dei preferiti) e una vista a carosello immersiva.
+* **Schede Tecniche Dettagliate:** Traccia la condizione estetica e meccanica (scala 1-10), la data e il prezzo di acquisto, il valore di mercato stimato, la dotazione (scatola, documenti) e i dettagli del centro assistenza.
+* **Motore di Ricerca e Filtri:** Trova rapidamente l'orologio perfetto filtrando per marca, anno, prezzo o stato "preferito". Esporta i risultati in formato CSV.
+* **Registro Revisioni & Promemoria:** Archivia lo storico degli interventi di manutenzione (date, costi, fornitori). Ricevi avvisi in-app configurabili per garanzie e revisioni in scadenza, con anticipo personalizzabile.
+* **Sistema di Backup Incrementale:** Esporta un file JSON autonomo contenente tutti i tuoi dati, incluse le immagini, le preferenze outfit e le notifiche. Il ripristino unisce i dati in modo intelligente senza sovrascrivere i record non interessati. Inoltre, un flusso automatizzato tramite GitHub Actions mantiene sempre reattivo il database del progetto.
 
-### Storage privato delle foto
+## 🧠 Intelligenza Artificiale e Analisi
 
-Le foto degli orologi sono conservate nel bucket privato `watch-photos-private`; gli sfondi pubblici continuano a usare `fotoWatch`. Per attivare le transazioni di salvataggio e il bucket privato:
+* **L'Abbinamento Perfetto (Completa l'Outfit):** Sfrutta l'analisi visiva tramite un modello AI ospitato su Hugging Face. Carica un'immagine del tuo look, imposta filtri per occasione o colore, e lascia che l'algoritmo valuti e metta a confronto i segnatempo della tua collezione (addestrando il sistema tramite feedback 👍/👎).
+* **Orologio del Giorno:** Lasciati ispirare da una selezione casuale quotidiana, perfetta per sconfiggere l'indecisione mattutina.
+* **Dashboard Finanziaria e Statistiche:** Monitora il Delta tra spesa totale e valore attuale della collezione. Visualizza grafici interattivi sulla distribuzione dei marchi, decenni di produzione, tipologia di movimento e andamento storico degli acquisti.
 
-1. Applica le migration SQL in `supabase/migrations/` in ordine cronologico, inclusa `20261025_security_hardening.sql`.
-2. Distribuisci la nuova versione dell’app.
-3. Esegui un backup del database e dei file Storage, poi migra le foto esistenti impostando `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nell’ambiente e avviando `npm run migrate:watch-photos`.
+## 🔒 Storage Privato e Sicurezza
 
-La chiave `SUPABASE_SERVICE_ROLE_KEY` è privilegiata: usala solo in un ambiente amministrativo sicuro e non inserirla nel repository o nelle variabili `VITE_*`. Lo script sposta le foto associate alle schede orologio, aggiorna i riferimenti, trasferisce in privato anche gli altri file nelle cartelle utente e rimuove le copie pubbliche; lascia intatti gli sfondi nella cartella principale. Le immagini esterne o le copie pubbliche non rimosse vengono segnalate e richiedono verifica manuale.
+Le fotografie della tua collezione sono custodite in un bucket privato Supabase (`watch-photos-private`), garantendo la massima riservatezza (mentre gli sfondi restano accessibili pubblicamente). 
 
-Per gli abbinamenti outfit e per preparare le foto degli orologi agli abbinamenti, le immagini vengono inviate via HTTPS al servizio AI ospitato su Hugging Face; l’interfaccia lo segnala nei punti di caricamento.
+Le migrazioni SQL (inclusa la `20261025_security_hardening.sql`) blindano le transazioni di salvataggio. Uno script dedicato (`npm run migrate:watch-photos`) si occupa di trasferire i media esistenti in un ambiente protetto, aggiornare i riferimenti nel database e ripulire le vecchie copie pubbliche, richiedendo l'uso privilegiato della `SUPABASE_SERVICE_ROLE_KEY` in ambiente amministrativo.
 
-## 🧠 Funzioni Intelligenti e Interattive
-- Valore della collezione: Confronto tra spesa d’acquisto e valore dichiarato, con andamento degli acquisti per anno.
-- Orologio del Giorno: Selezione casuale di un orologio dalla collezione per suggerire cosa indossare.
-- Completa l'Outfit: Analisi visiva dell’immagine, filtri per occasione e colore, preferenze 👍/👎, confronto tra due orologi e preparazione guidata dei modelli senza analisi AI.
-- Statistiche collezione: Spesa d’acquisto, valore dichiarato, condizione media, dotazione, garanzia, distribuzione per marca e movimento, valutazioni, decenni di produzione e acquisti per anno.
+## 🎨 Interfaccia e Performance
 
-## 🎧 Interfaccia Utente e Performance
-- Modalità Scuro/Chiaro: Toggle dinamico della Dark Mode.
-- Effetti Visivi: Effetto "frosted glass" sulla barra di navigazione.
-- Orologio Analogico Funzionante: Un orologio analogico in CSS e JavaScript puro che mostra l'ora attuale.
-- Brand Scroller: Liste di marchi in scorrimento continuo per un tocco estetico.
+* **Design Adattivo:** Supporto nativo e transizione fluida tra Modalità Chiara e Scura.
+* **Dettagli Estetici:** Effetto *frosted glass* sulla navigazione, brand scroller continui e un widget orologio analogico renderizzato in puro CSS e JavaScript.
+* **Animazioni Fluide:** Utilizzo di Framer Motion per garantire un'esperienza reattiva (come l'effetto FLIP nel riordino dei preferiti).
 
 ## 🛠️ Stack Tecnologico
 
-| Categoria | Tecnologia | Note |
+| Categoria | Tecnologia | Utilizzo |
 | :--- | :--- | :--- |
-| **Frontend** | **React** (Hooks, `useMemo`, `useTransition`) | Sviluppo dell'interfaccia utente. |
-| **Styling/Animazioni** | **Framer Motion** | Per animazioni fluide del layout (effetto FLIP nel cambio di ordine dei preferiti). |
-| **Carosello** | **Swiper.js (via React)** | Componente leader per caroselli e slider. |
-| **Backend/DB** | **Supabase** | Backend-as-a-Service (Auth, Database PostgreSQL, Storage). |
-| **Storage** | **Supabase Storage** | Gestione dello storage delle immagini. |
+| **Frontend** | React | Hooks avanzati (`useMemo`, `useTransition`) per performance ottimali. |
+| **Styling & UI** | Framer Motion | Gestione delle animazioni fisiche e transizioni di layout. |
+| **Componenti** | Swiper.js | Implementazione del carosello touch-friendly. |
+| **Backend & DB** | Supabase | Auth, Database PostgreSQL e backend-as-a-service. |
+| **Storage** | Supabase Storage | Gestione sicura e privata dei bucket fotografici. |
 
+## 📸 Anteprima
 
-## 📷 Screenshots
-
-Screenshot della versione aggiornata dell’applicazione:
-
+* Home Page (Tema Chiaro)
 ![Home](./screenshot/home.png)
+* Home Page (Tema Scuro)
 ![Home in modalità scura](./screenshot/homeBlack.png)
+* Vista Collezione
 ![Collezione](./screenshot/collection.png)
+* Scheda Dettaglio Orologio
 ![Dettaglio orologio](./screenshot/infoWatch.png)
+* Motore di Abbinamento Outfit
 ![Completa l’outfit](./screenshot/outfitMatch.png)
-
-## 📈 Contributing
-
-Grazie per voler contribuire! Puoi contribuire tramite:
-- Segnalazioni di bug (issue)
-- Proposte di funzionalità (issue)
-- Pull request con fix o miglioramenti
-
-Linee guida rapide:
-1. Fork del repository.
-2. Crea un branch feature/bugfix: git checkout -b feature/nome-feature
-3. Fai i tuoi cambiamenti e committa: git commit -m "Descrizione"
-4. Apri una pull request verso il branch principale del repo originale.
-
 
 ## 📍 Roadmap
 
-### Completato
+**Completato:**
+- [x] Integrazione note aggiuntive, condizione (1-10) e selettore complicazioni.
+- [x] Tracking dotazione, garanzia e registro completo revisioni con notifiche.
+- [x] Backup/ripristino con immagini incluse.
+- [x] Filtri di ricerca avanzati e dashboard statistiche responsive.
+- [x] Suggerimenti outfit tramite intelligenza artificiale.
+- [x] Tracking spesa d'acquisto vs valore dichiarato.
 
-- [x] Selettore delle varie complicazioni
-- [x] Note aggiuntive per ogni orologio
-- [x] Condizione dell'orologio (scala 1-10)
-- [x] Dotazione: Scatola, documenti e accessori.
-- [x] Garanzia: Periodo e rivenditore o centro assistenza.
-- [x] Registro revisioni: Date, interventi, costi e prossima scadenza.
-- [x] Promemoria per le revisioni imminenti con possibilità di eliminare l’avviso.
-- [x] Backup e ripristino completo con immagini e unione dei dati.
-- [x] Filtri di ricerca avanzati per marca, prezzo, anno
-- [x] Suggerimenti outfit con filtri, feedback, confronto e gestione dei modelli non ancora analizzati.
-- [x] Schermata statistiche ampliata e responsive.
+**In Sviluppo / Futuro:**
+- [ ] Importazione CSV guidata con anteprima e rilevamento duplicati.
+- [ ] Analisi granulare dei costi di manutenzione per singolo orologio.
+- [ ] Archiviazione storica degli orologi venduti (mantenendo consultabili i dati e gli interventi passati).
 
-### Prossimi sviluppi
+## 📈 Contribuire
 
-- [ ] Importazione CSV con anteprima, verifica dei campi e rilevamento dei duplicati.
-- [x] Prezzo e data di acquisto, valore dichiarato e riepilogo della spesa per anno.
-- [ ] Analisi dei costi di manutenzione per anno e per orologio.
-- [x] Notifiche configurabili per scadenze di garanzia e prossime revisioni.
-- [ ] Archiviazione degli orologi venduti mantenendo consultabili scheda e manutenzioni.
+Contributi, segnalazioni e idee sono benvenuti. Per partecipare:
+1. Effettua un Fork del repository.
+2. Crea un branch per la tua feature (`git checkout -b feature/nuova-funzionalita`).
+3. Effettua il commit dei cambiamenti (`git commit -m "Aggiunta nuova funzionalità"`).
+4. Apri una Pull Request verso il branch principale.
 
-## 👤 Contributors
+## 👤 Maintainer
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section --> 
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-| Name | Role |
-| --- | --- |
-| [effe1209](https://github.com/effe1209) | 👨‍💻 Mantainer, Code |
-<!--| [altroUtente](https://github.com/altroUtente) | 📝 Documentazione |-->
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-## 📧 Contatti
-
-- Maintainer: effe1209 — https://github.com/effe1209
+Progettato e sviluppato da **[effe1209](https://github.com/effe1209)**.
 
 ## 🫶 Ringraziamenti
 
-- Supabase — per backend e storage
-- Framer Motion — per le animazioni
-- Swiper.js — per il carosello
+* **Supabase** — per l'infrastruttura dati e storage
+* **Framer Motion** — per le animazioni
+* **Swiper.js** — per il carosello
