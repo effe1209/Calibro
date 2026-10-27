@@ -3,6 +3,8 @@ import FeatureCheckboxList from './FeatureCheckboxList'; // Importa il nuovo com
 import Stepper, { Step } from './Stepper';
 import WatchOccasionSelector from './WatchOccasionSelector';
 import ExternalImageProcessingNotice from './ExternalImageProcessingNotice';
+import { triggerLightImpact } from './nativeFeedback';
+import { useObjectUrl } from './useObjectUrl';
 
 
 // Questo è solo il Form per aggiungere un orologio
@@ -22,6 +24,9 @@ const AddWatchForm = ({
   handleCancel,
   isDark
 }) => {
+  const previewImageUrl = useObjectUrl(
+    typeof Blob !== 'undefined' && newWatch.image instanceof Blob ? newWatch.image : null
+  );
 
   // Se non dobbiamo mostrarlo, non renderizziamo nulla
   if (!showForm) {
@@ -209,17 +214,19 @@ const AddWatchForm = ({
               id="file-upload-add"
               multiple={false}
             />
-            <button type="button" className="upload-button" onClick={() => fileInputRef.current.click()}>
+            <button type="button" className="upload-button" onClick={() => {
+              void triggerLightImpact();
+              fileInputRef.current?.click();
+            }}>
               📸 Seleziona un'immagine
             </button>
           </div>
           <ExternalImageProcessingNotice />
-          {newWatch.image && typeof newWatch.image === 'object' && (
+          {previewImageUrl && (
             <img
-              src={URL.createObjectURL(newWatch.image)}
+              src={previewImageUrl}
               alt="Anteprima dell'orologio"
               className="preview-image add-watch-preview"
-              onLoad={() => URL.revokeObjectURL(newWatch.image)}
             />
           )}
         </Step>

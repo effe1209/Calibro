@@ -82,6 +82,9 @@ function DarkModeSwitch({ isDark, toggleTheme }) {
           <MaterialUISwitch 
             checked={isDark}
             onChange={toggleTheme}
+            inputProps={{
+              'aria-label': isDark ? 'Attiva modalità chiara' : 'Attiva modalità scura',
+            }}
           />
         }
         label="" 

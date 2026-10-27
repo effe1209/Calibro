@@ -1,16 +1,21 @@
 import React, { lazy, Suspense, useState, useEffect, useRef, useTransition, useMemo, useCallback } from "react";
 import { createPortal } from 'react-dom';
 import imageCompression from 'browser-image-compression';
+import { Capacitor } from '@capacitor/core';
+import { Share } from '@capacitor/share';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { getOptimizedOutfitEmbedding, getOutfitEmbedding } from './components/outfitService';
+import { triggerLightImpact } from './components/nativeFeedback';
 // Import Supabase e servizi (invariati)
 import { supabase } from './components/supabaseClient';
 import { addWatchService } from './components/watchService';
 import {
   getWatchImageUrl,
-  getWatchImageUrls,
   removeWatchImage,
   uploadWatchImage,
 } from './components/imageService';
 import { downloadFullBackup, parseBackupFile, restoreFullBackup } from './components/backupService';
+import { useWatchCollection } from './components/useWatchCollection';
 import AuthForm from './components/AuthForm';
 import GlassSurface from './components/GlassSurface';
 import TiltedCard from './components/TiltedCard';
@@ -53,7 +58,6 @@ function App() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWatch, setSelectedWatch] = useState(null);
   const modifyBackHandlerRef = useRef(null);
-  const watchFetchRequestRef = useRef(0);
   const fileInputRef = useRef(null);
   const fileInputRefOutfit = useRef(null);
   const backupInputRef = useRef(null);
@@ -62,8 +66,15 @@ function App() {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
-  const [watches, setWatches] = useState([]);
-  const [missingOutfitEmbeddingIds, setMissingOutfitEmbeddingIds] = useState([]);
+  const {
+    watches,
+    setWatches,
+    missingOutfitEmbeddingIds,
+    setMissingOutfitEmbeddingIds,
+    fetchWatches,
+    invalidateRequests: invalidateWatchRequests,
+    clearCollection,
+  } = useWatchCollection(setMessage);
   const missingOutfitEmbeddingCount = missingOutfitEmbeddingIds.length;
   const [maintenanceRefreshKey, setMaintenanceRefreshKey] = useState(0);
   const [watchConsigliati, setWatchConsigliati] = useState([]);
@@ -268,6 +279,22 @@ function App() {
     return () => observer.disconnect();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return undefined;
+
+    const shortcut = new URLSearchParams(window.location.search).get('shortcut');
+    const sectionId = {
+      collection: 'watch-list-section',
+      functions: 'function-section',
+    }[shortcut];
+    if (!sectionId) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [user]);
+
 
   // Effetti di scroll e anchor link
   useEffect(() => {
@@ -301,7 +328,7 @@ function App() {
 
     const savedNickname = localStorage.getItem('nickname');
     if (savedNickname) setNickname(savedNickname);
-  }, []);
+  }, [fetchWatches]);
 
   // Salva nickname
   useEffect(() => {
@@ -433,10 +460,8 @@ function App() {
     try {
       const { error } = await supabase.auth.signOut({ scope: 'local' });
       if (error) throw error;
-      watchFetchRequestRef.current += 1;
+      clearCollection();
       setUser(null);
-      setWatches([]);
-      setMissingOutfitEmbeddingIds([]);
       setEmail('');
       setPassword('');
       setNickname('');
@@ -458,6 +483,7 @@ function App() {
   };
 
 const handleAddWatch = async () => {
+  const imageToEmbed = newWatch.image instanceof File ? newWatch.image : null;
   const stateOptions = {
     newWatch,
     user,
@@ -472,30 +498,47 @@ const handleAddWatch = async () => {
     const added = await addWatchService(stateOptions);
     if (!added) return;
 
-    let outfitEmbeddingWarning = false;
-    if (newWatch.image instanceof File && added.id) {
-      setLoading(true);
-      setMessage('Orologio salvato. Lo preparo anche per gli abbinamenti outfit…');
-      try {
-        const embedding = await getOptimizedOutfitEmbedding(newWatch.image);
-        const { error: embeddingError } = await supabase
-          .from('watches')
-          .update({ embedding })
-          .eq('id', added.id);
-        if (embeddingError) throw embeddingError;
-      } catch (error) {
-        console.error('Impossibile preparare l’orologio per gli abbinamenti outfit:', error);
-        outfitEmbeddingWarning = true;
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    setMessage(outfitEmbeddingWarning
-      ? 'Orologio aggiunto. Non è stato possibile includerlo negli abbinamenti outfit: riprova più tardi.'
-      : 'Orologio aggiunto con successo!');
+    invalidateWatchRequests();
+    void triggerLightImpact();
     handleCancel();
-    await fetchWatches(user.id);
+
+    if (imageToEmbed && added.id) {
+      const pendingMessage = 'Orologio aggiunto. Preparo gli abbinamenti outfit in background…';
+      const successMessage = 'Orologio aggiunto con successo!';
+      setMissingOutfitEmbeddingIds((currentIds) => (
+        currentIds.some((id) => String(id) === String(added.id))
+          ? currentIds
+          : [...currentIds, added.id]
+      ));
+      setMessage(pendingMessage);
+
+      void (async () => {
+        try {
+          const embedding = await getOptimizedOutfitEmbedding(imageToEmbed);
+          const { error: embeddingError } = await supabase
+            .from('watches')
+            .update({ embedding })
+            .eq('id', added.id);
+          if (embeddingError) throw embeddingError;
+
+          setMissingOutfitEmbeddingIds((currentIds) => (
+            currentIds.filter((id) => String(id) !== String(added.id))
+          ));
+          setMessage((currentMessage) => (
+            currentMessage === pendingMessage ? successMessage : currentMessage
+          ));
+        } catch (error) {
+          console.error('Impossibile preparare l’orologio per gli abbinamenti outfit:', error);
+          setMessage((currentMessage) => (
+            currentMessage === pendingMessage
+              ? 'Orologio aggiunto. Non è stato possibile includerlo negli abbinamenti outfit: riprova più tardi.'
+              : currentMessage
+          ));
+        }
+      })();
+    } else {
+      setMessage('Orologio aggiunto con successo!');
+    }
   } catch (error) {
     console.error("Errore (da addWatchService):", error);
     setMessage(error.message || "Errore durante l'aggiunta dell'orologio.");
@@ -523,7 +566,7 @@ const handleAddWatch = async () => {
     try {
       const { error } = await supabase.from("watches").delete().eq("id", id);
       if (error) throw error;
-      watchFetchRequestRef.current += 1;
+      invalidateWatchRequests();
       setWatches(prevWatches => prevWatches.filter(watch => watch.id !== id));
       setMissingOutfitEmbeddingIds((currentIds) => (
         currentIds.filter((missingId) => String(missingId) !== String(id))
@@ -546,54 +589,6 @@ const handleAddWatch = async () => {
       return false;
     }
   };
-
-const fetchWatches = async (userid) => {
-  const requestId = ++watchFetchRequestRef.current;
-  try {
-    const [
-      { data, error },
-      { data: watchesWithoutEmbeddings, error: embeddingsError },
-    ] = await Promise.all([
-      supabase
-        .from("watches")
-        .select("id, name, brand, movement, year, image, color, isFavorite, money, note, has_box, has_papers, accessories, has_warranty, warranty_start, warranty_end, warranty_provider, condition_rating, occasions, purchase_date, declared_value, created_at, Orologi_Caratteristiche(*, caratteristiche(*))")
-        .eq("userid", userid),
-      supabase
-        .from("watches")
-        .select("id")
-        .eq("userid", userid)
-        .not("image", "is", null)
-        .neq("image", "")
-        .is("embedding", null),
-    ]);
-    if (error) throw error;
-    if (embeddingsError) throw embeddingsError;
-    if (requestId !== watchFetchRequestRef.current) return false;
-
-    const watchRows = data || [];
-    const imageUrls = await getWatchImageUrls(watchRows.map((watch) => watch.image));
-    if (requestId !== watchFetchRequestRef.current) return false;
-
-    const userWatches = watchRows.map((watch, index) => {
-      const features = (watch.Orologi_Caratteristiche || [])
-        .map((joinEntry) => joinEntry?.caratteristiche)
-        .filter(Boolean);
-      return {
-        ...watch,
-        caratteristiche: features,
-        imageUrl: imageUrls[index],
-      };
-    });
-    setWatches(userWatches);
-    setMissingOutfitEmbeddingIds((watchesWithoutEmbeddings || []).map((watch) => watch.id));
-    return true;
-  } catch (error) {
-    if (requestId === watchFetchRequestRef.current) {
-      setMessage("Errore durante il recupero degli orologi: " + error.message);
-    }
-    return false;
-  }
-};
 
   const handleCreateBackup = async () => {
     if (!user || isBackupBusy) return;
@@ -670,6 +665,7 @@ const fetchWatches = async (userid) => {
       if (watches && watches.length > 0) {
         const randomIndex = Math.floor(Math.random() * watches.length);
         const randomWatch = watches[randomIndex];
+        void triggerLightImpact();
         setSelectedWatch(randomWatch);
         setModalTitle("Orologio del Giorno");
         setIsModalVisible(true);
@@ -738,8 +734,30 @@ const fetchWatches = async (userid) => {
   };
 
   const handleInfoWatch = (watchToShow) => {
+    void triggerLightImpact();
     setSelectedWatch(watchToShow);
     setIsInfoVisible(true);
+  };
+
+  const handleShareWatch = async (watch) => {
+    const description = [watch.brand, watch.name, watch.year]
+      .filter(Boolean)
+      .join(' ');
+    const text = `Scopri ${description} dalla mia collezione Calibro.`;
+
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({ title: watch.name, text });
+      } else if (typeof navigator.share === 'function') {
+        await navigator.share({ title: watch.name, text });
+      } else {
+        setMessage('La condivisione non è disponibile su questo browser.');
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+      console.error('Impossibile condividere l’orologio:', error);
+      setMessage('Non è stato possibile aprire il foglio di condivisione.');
+    }
   };
 
   const handleMaintenanceChanged = () => {
@@ -866,6 +884,7 @@ const handleFavoriteToggle = async (watchId) => {
     
     // 2. Calcoliamo il nuovo stato
     const newFavoriteState = !currentWatch.isFavorite;
+    void triggerLightImpact();
 
     // 3. AGGIORNAMENTO OTTIMISTICO (UI Immediata)
     startTransition(() => {
@@ -921,58 +940,6 @@ const handleFavoriteToggle = async (watchId) => {
         setMessage("Errore nell'aggiornamento dei preferiti.");
     }
   };
-
-// Modifica questa funzione in App.jsx
-async function getOutfitEmbedding(fileOrBlob) {
-  const formData = new FormData();
-  
-  // TRUCCO: Se è un Blob (e non un File da input), aggiungiamo manualmente un nome file.
-  // Senza questo, il server Python riceve un file senza nome e può rifiutarlo.
-  if (fileOrBlob instanceof Blob && !fileOrBlob.name) {
-      formData.append('file', fileOrBlob, 'image_from_db.jpg');
-  } else {
-      formData.append('file', fileOrBlob);
-  }
-
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 45000);
-
-  try {
-    const response = await fetch('https://effe02-chroneapp-server.hf.space/embed-image', {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      throw new Error('Il servizio di analisi non è disponibile. Riprova tra poco.');
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data.vector) || data.vector.length === 0) {
-      throw new Error('L’analisi non ha prodotto un risultato. Prova con un’altra foto.');
-    }
-    return data.vector;
-  } catch (error) {
-    console.error("Dettaglio errore AI:", error);
-    if (error.name === 'AbortError') {
-      throw new Error('L’analisi sta impiegando troppo tempo. Riprova con una foto più leggera.');
-    }
-    throw error;
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-}
-
-async function getOptimizedOutfitEmbedding(file) {
-  const optimizedImage = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1280,
-    initialQuality: 0.82,
-    useWebWorker: true,
-  });
-  return getOutfitEmbedding(optimizedImage);
-}
 
 const handleImageUpload = async (event) => {
   const file = event.target.files[0];
@@ -1078,6 +1045,7 @@ const handleImageUpload = async (event) => {
           .slice(0, 8)
       );
       setIsCarouselVisible(true);
+      void triggerLightImpact();
       setMessage(filtersRelaxed
         ? 'Nessun orologio corrisponde a tutti i filtri: ti mostro i più vicini alla foto.'
         : 'Ecco gli abbinamenti dalla tua collezione.');
@@ -1127,8 +1095,8 @@ const handleOutfitFeedback = async (watchId, feedback) => {
 // Aggiungilo in cima ad App.jsx o in un file separato
 const LoadingModal = ({ message }) => {
   return (
-    <div className="loading-overlay">
-      <div className="spinner"></div>
+    <div className="loading-overlay" role="status" aria-live="polite" aria-busy="true">
+      <div className="spinner" aria-hidden="true"></div>
       <div className="loading-text">{message || "Caricamento in corso..."}</div>
       {/* Opzionale: piccolo testo per i tempi di attesa dell'AI */}
       <small style={{marginTop: "10px", opacity: 0.7, fontSize: "0.8rem"}}>
@@ -1311,8 +1279,42 @@ const watchBrands = useMemo(() => [
     }
   }, [isDark]);
 
+  useEffect(() => {
+    const isNative = Capacitor.isNativePlatform();
+    document.documentElement.classList.toggle('capacitor-native', isNative);
+    if (!isNative) return undefined;
+
+    const compactViewport = window.matchMedia('(max-width: 720px)');
+    const isIOS = Capacitor.getPlatform() === 'ios';
+    const syncNativeChrome = async (isCompactViewport = compactViewport.matches) => {
+      try {
+        await StatusBar.setOverlaysWebView({
+          overlay: !isIOS || !isCompactViewport,
+        });
+        await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+        const themeColor = isDark ? '#0b131c' : '#f4f7fa';
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+      } catch (error) {
+        console.error('Impossibile sincronizzare la barra di stato iOS:', error);
+      }
+    };
+
+    void syncNativeChrome();
+    const handleViewportChange = (event) => {
+      if (isIOS) void syncNativeChrome(event.matches);
+    };
+    compactViewport.addEventListener('change', handleViewportChange);
+    return () => {
+      compactViewport.removeEventListener('change', handleViewportChange);
+      document.documentElement.classList.remove('capacitor-native');
+    };
+  }, [isDark]);
+
   // Funzione helper per cambiare stato (opzionale, ma pulita)
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = () => {
+    void triggerLightImpact();
+    setIsDark((current) => !current);
+  };
 
   const isOverlayOpen = loading
     || isModalVisible
@@ -1542,7 +1544,14 @@ const BackgroundLayer = useMemo(() => {
         )}
       </div>
 
-      {message && <p className="message" onClick={() => setMessage(null)}>{message}</p>}
+      {message && (
+        <div className="message" role="status" aria-live="polite" aria-atomic="true">
+          <span>{message}</span>
+          <button type="button" aria-label="Chiudi notifica" onClick={() => setMessage(null)}>
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+      )}
       {loading && <div className="loading-spinner"></div>} 
       <div style={{ marginBottom: "20px" }}></div>
 
@@ -1701,6 +1710,7 @@ const BackgroundLayer = useMemo(() => {
             selectedWatch={selectedWatch}
             handleDeleteWatch={handleDeleteWatch}
             handleFavoriteToggle={handleFavoriteToggle}
+            onShareWatch={handleShareWatch}
             userId={user?.id}
             onMaintenanceChanged={handleMaintenanceChanged}
           />

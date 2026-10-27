@@ -190,7 +190,7 @@ body {
 /* 2. Bold */
 @font-face {
   font-family: 'minork';
-  src: url('../font/minorksans-bold.otf') format('opentype'); /* Sostituisci con il nome esatto del tuo file */
+  src: url('../font/minorksans-extrabold.otf') format('opentype');
   font-weight: 700; /* O "bold" */
   font-style: normal;
 }

@@ -1,10 +1,12 @@
 import React from 'react';
 import { OUTFIT_OCCASIONS } from './outfitPreferences';
+import { triggerSelectionFeedback } from './nativeFeedback';
 
 const WatchOccasionSelector = ({ value = [], onChange, idPrefix }) => {
   const selectedOccasions = Array.isArray(value) ? value : [];
 
   const toggleOccasion = (occasion) => {
+    void triggerSelectionFeedback();
     const nextOccasions = selectedOccasions.includes(occasion)
       ? selectedOccasions.filter((selected) => selected !== occasion)
       : [...selectedOccasions, occasion];

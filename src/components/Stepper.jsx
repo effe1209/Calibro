@@ -1,5 +1,5 @@
-import React, { useState, Children, useRef, useLayoutEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, Children, useRef, useLayoutEffect, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 import './componentCSS/Stepper.css';
 
@@ -26,15 +26,38 @@ export default function Stepper({
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [direction, setDirection] = useState(0);
   const indicatorRowRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
+  const [isCompactViewport, setIsCompactViewport] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  );
   const stepsArray = Children.toArray(children);
   const totalSteps = stepsArray.length;
   const isCompleted = currentStep > totalSteps;
   const isLastStep = currentStep === totalSteps;
 
   useLayoutEffect(() => {
-    const activeIndicator = indicatorRowRef.current?.children[(currentStep - 1) * 2];
-    activeIndicator?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }, [currentStep]);
+    const row = indicatorRowRef.current;
+    const activeIndicator = row?.children[(currentStep - 1) * 2];
+    if (!row || !activeIndicator || row.scrollWidth <= row.clientWidth) return;
+
+    const rowRect = row.getBoundingClientRect();
+    const indicatorRect = activeIndicator.getBoundingClientRect();
+    const nextScrollLeft = row.scrollLeft
+      + indicatorRect.left
+      - rowRect.left
+      - (row.clientWidth - indicatorRect.width) / 2;
+    row.scrollTo({
+      left: Math.max(0, nextScrollLeft),
+      behavior: isCompactViewport || prefersReducedMotion ? 'auto' : 'smooth',
+    });
+  }, [currentStep, isCompactViewport, prefersReducedMotion]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 640px)');
+    const updateViewport = (event) => setIsCompactViewport(event.matches);
+    mediaQuery.addEventListener('change', updateViewport);
+    return () => mediaQuery.removeEventListener('change', updateViewport);
+  }, []);
 
   const updateStep = newStep => {
     setCurrentStep(newStep);
@@ -92,9 +115,16 @@ export default function Stepper({
                       updateStep(clicked);
                     }}
                     isDark={isDark}
+                    reduceMotion={prefersReducedMotion}
                   />
                 )}
-                {isNotLastStep && <StepConnector isComplete={currentStep > stepNumber} isDark={isDark} />}
+                {isNotLastStep && (
+                  <StepConnector
+                    isComplete={currentStep > stepNumber}
+                    isDark={isDark}
+                    reduceMotion={prefersReducedMotion}
+                  />
+                )}
               </React.Fragment>
             );
           })}
@@ -104,6 +134,8 @@ export default function Stepper({
           isCompleted={isCompleted}
           currentStep={currentStep}
           direction={direction}
+          isCompactViewport={isCompactViewport}
+          reduceMotion={prefersReducedMotion}
           className={`step-content-default ${contentClassName}`}
         >
           {stepsArray[currentStep - 1]}
@@ -153,19 +185,34 @@ export default function Stepper({
   );
 }
 
-function StepContentWrapper({ isCompleted, currentStep, direction, children, className }) {
+function StepContentWrapper({
+  isCompleted,
+  currentStep,
+  direction,
+  isCompactViewport,
+  reduceMotion,
+  children,
+  className,
+}) {
   const [parentHeight, setParentHeight] = useState(0);
+  const handleHeightReady = useCallback((height) => setParentHeight(height), []);
 
   return (
     <motion.div
       className={className}
       style={{ position: 'relative', overflow: 'hidden' }}
       animate={{ height: isCompleted ? 0 : parentHeight }}
-      transition={{ type: 'spring', duration: 0.4 }}
+      transition={isCompactViewport || reduceMotion ? { duration: 0 } : { type: 'spring', duration: 0.4 }}
     >
       <AnimatePresence initial={false} mode="sync" custom={direction}>
         {!isCompleted && (
-          <SlideTransition key={currentStep} direction={direction} onHeightReady={h => setParentHeight(h)}>
+          <SlideTransition
+            key={currentStep}
+            direction={direction}
+            onHeightReady={handleHeightReady}
+            isCompactViewport={isCompactViewport}
+            reduceMotion={reduceMotion}
+          >
             {children}
           </SlideTransition>
         )}
@@ -174,7 +221,7 @@ function StepContentWrapper({ isCompleted, currentStep, direction, children, cla
   );
 }
 
-function SlideTransition({ children, direction, onHeightReady }) {
+function SlideTransition({ children, direction, onHeightReady, isCompactViewport, reduceMotion }) {
   const containerRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -187,6 +234,7 @@ function SlideTransition({ children, direction, onHeightReady }) {
       onHeightReady(element.offsetHeight);
     });
 
+    onHeightReady(element.offsetHeight);
     // 2. Inizia ad osservare il div
     resizeObserver.observe(element);
 
@@ -202,7 +250,7 @@ function SlideTransition({ children, direction, onHeightReady }) {
       initial="enter"
       animate="center"
       exit="exit"
-      transition={{ duration: 0.4 }}
+      transition={{ duration: reduceMotion ? 0 : isCompactViewport ? 0.18 : 0.4, ease: 'easeOut' }}
       style={{ position: 'absolute', left: 0, right: 0, top: 0 }}
     >
       {children}
@@ -229,7 +277,7 @@ export function Step({ children }) {
   return <div className="step-default">{children}</div>;
 }
 
-function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators, isDark }) {
+function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators, isDark, reduceMotion }) {
   const status = currentStep === step ? 'active' : currentStep < step ? 'inactive' : 'complete';
 
   const handleClick = () => {
@@ -248,7 +296,7 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators, 
           complete: { scale: 1, backgroundColor: isDark ? 'var(--accent-primary_DARK)' : 'var(--accent-primary)',
       color: isDark ? '#172630' : '#FFFFFF' }
         }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: reduceMotion ? 0 : 0.3 }}
         className="step-indicator-inner"
       >
         {status === 'complete' ? (
@@ -263,7 +311,7 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators, 
   );
 }
 
-function StepConnector({ isComplete, isDark }) {
+function StepConnector({ isComplete, isDark, reduceMotion }) {
   const lineVariants = {
     incomplete: { width: 0, backgroundColor: 'transparent' },
     complete: { width: '100%', backgroundColor: isDark ? 'var(--accent-primary_DARK)' : 'var(--accent-primary)' }
@@ -276,7 +324,7 @@ function StepConnector({ isComplete, isDark }) {
         variants={lineVariants}
         initial={false}
         animate={isComplete ? 'complete' : 'incomplete'}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: reduceMotion ? 0 : 0.4 }}
       />
     </div>
   );

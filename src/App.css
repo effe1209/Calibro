@@ -3637,11 +3637,14 @@ a:focus-visible,
 }
 
 .watch-detail-actions .favoriteButton__button,
-.watch-detail-actions .modal-delete-btn {
+.watch-detail-actions .modal-delete-btn,
+.watch-detail-actions .modal-share-btn {
   position: static;
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
   place-items: center;
   padding: 0;
   border: 1px solid var(--ui-border);
@@ -3650,6 +3653,15 @@ a:focus-visible,
   color: var(--ui-accent);
   font-size: 1.2rem;
   line-height: 1;
+}
+
+.watch-detail-actions .modal-share-btn {
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, opacity 120ms ease;
+}
+
+.watch-detail-actions .modal-share-btn:hover {
+  background: var(--ui-accent-soft);
 }
 
 .watch-detail-actions .modal-delete-btn svg {
@@ -3828,8 +3840,10 @@ a:focus-visible,
 
   .watch-detail-actions .favoriteButton__button,
   .watch-detail-actions .modal-delete-btn {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
   }
 
   .watch-detail-grid {
@@ -4999,19 +5013,20 @@ a:focus-visible,
 #listWatch.buttonView > button {
   display: flex;
   width: 100% !important;
+  height: auto;
   min-width: 0;
-  min-height: 64px;
+  min-height: 80px;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
   margin: 0;
-  padding: 10px 14px;
+  padding: 14px 18px;
   border: 1px solid var(--ui-border);
   border-radius: 19px;
   background: var(--ui-surface-strong);
   color: var(--ui-text);
   box-shadow: 0 8px 24px rgba(27, 53, 68, 0.07), inset 0 1px rgba(255, 255, 255, 0.7);
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 650;
   text-align: left;
   transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
@@ -5050,9 +5065,9 @@ a:focus-visible,
 
 .buttonView__control-icon {
   display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--ui-accent) 15%, transparent);
   border-radius: 13px;
@@ -5061,8 +5076,8 @@ a:focus-visible,
 }
 
 .buttonView__control-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
@@ -5102,6 +5117,45 @@ a:focus-visible,
 
   #listWatch.buttonView > .buttonView__gallery {
     display: flex;
+  }
+
+  #listWatch.buttonView > button {
+    min-height: 76px;
+    padding: 13px 16px;
+  }
+}
+
+.watch-detail-overlay {
+  z-index: 20000;
+}
+
+@media (max-width: 640px) {
+  .watch-detail-overlay {
+    position: fixed;
+    inset: 0;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0;
+    background: var(--ui-surface-strong);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .watch-detail-overlay .infoView.watch-detail-modal {
+    width: 100%;
+    max-height: none;
+    min-height: 100dvh;
+    overflow: visible;
+    border-radius: 0;
+  }
+
+  .watch-detail-overlay .watch-detail-card {
+    box-sizing: border-box;
+    min-height: 100dvh;
+    padding-top: max(18px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
   }
 }
 
@@ -6401,10 +6455,16 @@ a:focus-visible,
 }
 
 .external-image-processing-notice {
-  margin: 8px 0 0;
+  margin: 8px 5% 0;
   color: var(--ui-muted);
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   line-height: 1.45;
+  max-width: 50%;
+  text-align: left;
+}
+
+.add-watch-form .step-default > .external-image-processing-notice {
+  max-width: 100%;
 }
 
 #function-section .function-card__copy .external-image-processing-notice {
@@ -7983,6 +8043,23 @@ a:focus-visible,
   }
 }
 
+html.capacitor-native,
+html.capacitor-native body {
+  min-height: 100dvh;
+}
+
+html.capacitor-native body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html.capacitor-native #root {
+  min-height: calc(100dvh - env(safe-area-inset-bottom, 0px));
+}
+
+html.capacitor-native .dock-panel {
+  bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* Barra globale fuori dal flusso di scorrimento: resta sempre raggiungibile su iOS. */
 .slideWrap_Container {
   position: fixed;
@@ -8121,6 +8198,125 @@ a:focus-visible,
 
 .collection-export-menu > summary::-webkit-details-marker {
   display: none;
+}
+
+button,
+a,
+[role="button"],
+summary,
+select,
+input[type="button"],
+input[type="submit"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button:not(:disabled), a, [role="button"], summary):active {
+  opacity: 0.78;
+  transition: opacity 120ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(button:not(:disabled), a, [role="button"], summary):active {
+    transition: none;
+  }
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 18px;
+  background: var(--ui-surface-strong);
+  color: var(--ui-text);
+  box-shadow: var(--ui-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
+  text-align: left;
+}
+
+.message > button {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ui-muted);
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.message > button:hover {
+  background: var(--ui-accent-soft);
+  color: var(--ui-text);
+}
+
+.message > button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ui-accent) 50%, white);
+  outline-offset: 2px;
+}
+
+.external-image-processing-notice,
+.add-watch-form .step-default > p.external-image-processing-notice,
+#function-section .function-card__copy > p.external-image-processing-notice {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  align-self: stretch;
+}
+
+#root button:not(:disabled),
+#root select,
+#root summary {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#root .watch-detail-actions .favoriteButton__button,
+#root .watch-detail-actions .modal-delete-btn,
+#root .watch-detail-actions .modal-share-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#root .watch-occasion-selector__options label,
+#root .watch-feature-selector__options label,
+#root .watch-equipment-check,
+#root .notification-settings__option,
+#root .collection-favorites-filter,
+#root .brand-strip .brand-pill {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@supports (-webkit-touch-callout: none) {
+  #root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]),
+  #root select,
+  #root textarea {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root input,
+  #root select,
+  #root textarea,
+  #root button,
+  #root a,
+  #root summary {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .collection-export-menu__chevron {
@@ -8763,4 +8959,27 @@ input[type="checkbox"]:not(.MuiSwitch-input):checked::before {
 input[type="checkbox"]:not(.MuiSwitch-input):focus-visible {
   outline: 3px solid var(--ui-accent-soft);
   outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .slideWrap_Container > .global-navigation-glass,
+  .slideWrap_Container > .global-navigation-glass.glass-surface--svg,
+  .slideWrap_Container > .global-navigation-glass.glass-surface--fallback {
+    background: #f4f7fa !important;
+    box-shadow: inset 0 0 0 1px rgba(24, 48, 62, 0.12) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  .slideWrap_Container > .global-navigation-glass::before {
+    display: none !important;
+  }
+
+  .dark-mode .slideWrap_Container > .global-navigation-glass,
+  .dark-mode .slideWrap_Container > .global-navigation-glass.glass-surface--svg,
+  .dark-mode .slideWrap_Container > .global-navigation-glass.glass-surface--fallback {
+    background: #12202d !important;
+    box-shadow: inset 0 0 0 1px rgba(232, 248, 252, 0.16) !important;
+  }
 }

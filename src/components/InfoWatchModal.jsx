@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import FavoriteButton from './FavoriteButton';
+import { Share2 } from 'lucide-react';
 import WatchDetails from './WatchDetails';
 import MaintenanceLog from './MaintenanceLog';
 
@@ -9,6 +11,7 @@ const InfoWatchModal = ({
   selectedWatch, 
   handleDeleteWatch, 
   handleFavoriteToggle,
+  onShareWatch,
   userId,
   onMaintenanceChanged,
 }) => {
@@ -28,8 +31,8 @@ const InfoWatchModal = ({
     return null;
   }
   
-  return (
-    <div className="modal-overlay" onClick={() => setIsVisible(false)}>
+  return createPortal(
+    <div className="modal-overlay watch-detail-overlay" onClick={() => setIsVisible(false)}>
       <div className="infoView watch-detail-modal" onClick={(event) => event.stopPropagation()}>
         <div className="modal-content watch-detail-card" role="dialog" aria-modal="true" aria-labelledby="watch-detail-title">
           <header className="watch-detail-heading">
@@ -38,6 +41,14 @@ const InfoWatchModal = ({
               <h2 id="watch-detail-title">{selectedWatch.name}</h2>
             </div>
             <div className="watch-detail-actions">
+              <button
+                type="button"
+                className="modal-share-btn"
+                onClick={() => onShareWatch(selectedWatch)}
+                aria-label={`Condividi ${selectedWatch.name}`}
+              >
+                <Share2 aria-hidden="true" size={20} />
+              </button>
               <FavoriteButton
                 isFavorite={selectedWatch.isFavorite}
                 onToggle={() => handleFavoriteToggle(selectedWatch.id)}
@@ -70,7 +81,8 @@ const InfoWatchModal = ({
           </footer>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
